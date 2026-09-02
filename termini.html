@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leucoteo — cosa si vede e cosa no</title>
+<meta name="description" content="Quali dati di una collaborazione sono visibili, a chi, e su quale base.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800&family=Poppins:wght@600&display=swap">
+<link rel="stylesheet" href="assets/stile.css">
+<script>document.documentElement.classList.add('con-script');</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M48 13 A43 43 0 0 0 48 99 Z' fill='%23FFB020'/%3E%3Cpath d='M52 1 A43 43 0 0 1 52 87 Z' fill='%233AE7CD'/%3E%3C/svg%3E">
+<style>
+.testo{max-width:720px;margin:0 auto;padding:0 22px}
+.testo h1{font-weight:800;letter-spacing:var(--tr-xl);
+  text-transform:lowercase;font-size:clamp(30px,5vw,52px);line-height:1}
+.testo h2{font-weight:700;letter-spacing:var(--tr-l);
+  text-transform:lowercase;font-size:21px;margin:44px 0 14px}
+.testo p{color:var(--gri-2);font-size:16px;margin-top:14px;line-height:1.65}
+.testo .occhiello{color:var(--gri);font-size:17px;margin-top:18px}
+.testo ul{margin-top:14px;display:flex;flex-direction:column;gap:11px}
+.testo li{display:flex;gap:11px;color:var(--gri-2);font-size:15.5px;line-height:1.55}
+.testo li .ico{width:17px;height:17px;flex:none;margin-top:4px}
+.si .ico{color:var(--bra-hi)} .no .ico{color:var(--male)}
+.tavola{width:100%;border-collapse:collapse;margin-top:20px;font-size:14.5px}
+.tavola th{text-align:left;font-size:12.5px;font-weight:600;letter-spacing:.02em;
+  color:var(--gri);padding:0 14px 12px 0;border-bottom:1px solid var(--bo)}
+.tavola td{padding:14px 14px 14px 0;border-bottom:1px solid #16191B;vertical-align:top;color:var(--gri-2)}
+.tavola td:first-child{color:var(--bia);font-weight:600}
+.barra-alta{border-bottom:1px solid var(--lin);background:var(--su-1)}
+.barra-alta .in{display:flex;align-items:center;gap:10px;padding:13px 0;min-height:54px}
+.piede{margin-top:60px;padding:28px 0 70px;border-top:1px solid var(--lin);color:var(--gri-3);font-size:12.5px}
+
+.marchio-w{font-size:18px}
+</style>
+</head>
+<body>
+
+<div class="colonne" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<div class="barra-alta">
+  <div class="wrap in">
+    <a class="riga" href="index.html" style="gap:9px;min-height:44px;padding:0 4px">
+      <span class="mon on" id="marchio" style="width:18px"></span>
+      <span class="marchio-w">leuc<span class="o" aria-hidden="true"></span>te<span aria-hidden="true">o</span></span>
+    </a>
+  </div>
+</div>
+
+<main style="padding:56px 0" id="testo"></main>
+
+<script type="module">
+import { MONETA_SVG } from './assets/moto.js';
+import { ICO } from './assets/segni.js';
+document.getElementById('marchio').innerHTML = MONETA_SVG;
+
+const si = t => `<li class="si">${ICO.fatto()}<span>${t}</span></li>`;
+const no = t => `<li class="no">${ICO.scartato()}<span>${t}</span></li>`;
+
+document.getElementById('testo').innerHTML = `
+<div class="testo">
+  <h1>cosa si vede<br>e cosa no</h1>
+  <p class="occhiello">Leucoteo mette in mano a un'azienda lo storico verificato di un creator.
+    È il cuore del prodotto, ed è anche la parte che tocca dati di persone e di imprese.
+    Qui c'è scritto esattamente cosa è visibile, a chi, e perché è lecito.</p>
+
+  <h2>la regola in una riga</h2>
+  <p>I dati di un creator sono suoi e li pubblica lui. I dati di un'azienda sono suoi e
+    non li pubblica nessun altro. Dove i due si incrociano, serve il consenso di entrambi —
+    e in mancanza, si mostra il meno possibile.</p>
+
+  <h2>di un creator, un'azienda vede</h2>
+  <ul>
+    ${si('Numero di collaborazioni concluse, e in che mesi')}
+    ${si('Formati consegnati: reel, storie, post, video')}
+    ${si('Se ha consegnato nei tempi concordati, e con quanto scarto')}
+    ${si('Il giudizio medio ricevuto dalle aziende, e le note lasciate')}
+    ${si('Il settore merceologico delle aziende con cui ha lavorato')}
+    ${si('Il totale aggregato di persone portate sui siti, su tutte le aziende insieme')}
+    ${si('Metriche pubbliche dei suoi profili social, lette dalle API ufficiali')}
+  </ul>
+  <p>Sono tutti dati che riguardano il creator. Il creator li rende visibili con un consenso
+    esplicito, revocabile in ogni momento dal suo profilo. Revocandolo, la scheda torna privata
+    e le aziende vedono solo quello che lui pubblica di sua iniziativa.</p>
+
+  <h2>di un'azienda, un'altra azienda non vede</h2>
+  <ul>
+    ${no('Il nome dell’azienda, se quella azienda non ha dato il consenso')}
+    ${no('Quanto ha fatturato una singola collaborazione')}
+    ${no('Il compenso pattuito con quel creator')}
+    ${no('I prodotti, i codici sconto o i margini')}
+    ${no('Qualunque dato dei clienti finali')}
+  </ul>
+  <p>Al posto del nome compare il settore: «un'azienda di skincare», «un'azienda di caffè».
+    Un'azienda può scegliere di farsi nominare — di solito conviene, perché vale come referenza —
+    ma è una scelta sua, spenta di partenza.</p>
+
+  <h2>chi vede cosa</h2>
+  <table class="tavola tab-schede">
+    <thead><tr><th>Dato</th><th>Il creator</th><th>L’azienda coinvolta</th><th>Altre aziende</th></tr></thead>
+    <tbody>
+      <tr><td class="primo">Compenso pattuito</td><td data-k="Il creator">sì</td><td data-k="L’azienda">sì</td><td data-k="Altre aziende">no</td></tr>
+      <tr><td class="primo">Clic sul link di quella collaborazione</td><td data-k="Il creator">sì</td><td data-k="L’azienda">sì</td><td data-k="Altre aziende">no</td></tr>
+      <tr><td class="primo">Persone portate, totale aggregato del creator</td><td data-k="Il creator">sì</td><td data-k="L’azienda">sì</td><td data-k="Altre aziende">sì</td></tr>
+      <tr><td class="primo">Contatti diretti (email, telefono)</td><td data-k="Il creator">sì</td><td data-k="L’azienda">solo ad accordo firmato</td><td data-k="Altre aziende">no</td></tr>
+      <tr><td class="primo">Collaborazioni dichiarate, non verificate</td><td data-k="Il creator">sì</td><td data-k="L’azienda">sì, marcate come tali</td><td data-k="Altre aziende">sì, marcate come tali</td></tr>
+      <tr><td class="primo">Nome dell’azienda</td><td data-k="Il creator">sì</td><td data-k="L’azienda">sì</td><td data-k="Altre aziende">solo col consenso</td></tr>
+      <tr><td class="primo">Puntualità nelle consegne</td><td data-k="Il creator">sì</td><td data-k="L’azienda">sì</td><td data-k="Altre aziende">sì</td></tr>
+      <tr><td class="primo">Giudizio e nota lasciati</td><td data-k="Il creator">sì</td><td data-k="L’azienda">sì</td><td data-k="Altre aziende">sì</td></tr>
+      <tr><td class="primo">Coordinate bancarie del creator</td><td data-k="Il creator">sì</td><td data-k="L’azienda">solo a lavoro approvato</td><td data-k="Altre aziende">no</td></tr>
+      <tr><td class="primo">Dati dei clienti finali</td><td data-k="Il creator">no</td><td data-k="L’azienda">sul proprio sito, non qui</td><td data-k="Altre aziende">no</td></tr>
+    </tbody>
+  </table>
+
+  <h2>le coordinate bancarie</h2>
+  <p>Dentro Leucoteo non passa denaro. L'azienda paga con un bonifico ordinario, e per farlo ha
+    bisogno dell'IBAN del creator: viene mostrato solo dopo che il lavoro è stato approvato,
+    solo all'azienda di quella collaborazione, e non compare mai in nessuna ricerca o scheda pubblica.</p>
+  <p>Un IBAN e un codice fiscale sono dati personali comuni: si possono trattare per eseguire
+    un contratto di cui l'interessato è parte. Vanno però conservati cifrati, mostrati solo a chi
+    deve pagare e cancellati quando il rapporto finisce.</p>
+
+  <h2>quello che leucoteo non promette</h2>
+  <p>L'accettazione dei termini con data, ora, indirizzo IP e conferma via codice è una firma
+    elettronica semplice: è valida, ma la sua efficacia in giudizio la valuta liberamente un
+    giudice. Leucoteo non è parte del contratto fra azienda e creator e non può farlo rispettare.
+    La tutela che offre è pratica, non giudiziaria: un accordo scritto, consegne datate,
+    un pagamento tracciato e una reputazione che vale per entrambi.</p>
+
+  <h2>nota</h2>
+  <p>Questo testo descrive come è progettato il prodotto. Non è un'informativa privacy né un
+    contratto: prima di andare in produzione va scritto da un legale, insieme all'informativa
+    ai sensi dell'art. 13 GDPR, all'accordo di nomina a responsabile con ogni azienda e al
+    contratto tipo fra le parti.</p>
+
+  <div class="piede">Ultimo aggiornamento: agosto 2026 · <a href="index.html" style="color:var(--gri-2);text-decoration:underline">torna al sito</a></div>
+</div>`;
+</script>
+</body>
+</html>

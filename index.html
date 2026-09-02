@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leucoteo — le collaborazioni fra creator e aziende, in un posto solo</title>
+<meta name="description" content="Accordo, consegne, pagamento e storico verificato. In beta: gratis per tutti, zero commissioni. Una collaborazione smette di vivere sparsa fra DM, mail e vocali.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800&family=Poppins:wght@600&display=swap">
+<link rel="stylesheet" href="assets/stile.css">
+<script>
+/* L'entrata in scena è una decorazione: se lo script si rompe, la
+   pagina deve restare leggibile. Le regole che nascondono .rise
+   valgono solo se questa riga è arrivata a segno. */
+document.documentElement.classList.add('con-script');
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M48 8 A42 42 0 0 0 48 92 Z' fill='%23FFB020'/%3E%3Cpath d='M52 8 A42 42 0 0 1 52 92 Z' fill='%233AE7CD'/%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   LEUCOTEO · sito
+   ============================================================ */
+
+/* --- la barra: flottante, staccata, quasi non c'è --- */
+.nav{position:fixed;top:14px;left:0;right:0;z-index:var(--z-sticky);pointer-events:none}
+.nav .guscio{
+  max-width:1080px;margin:0 auto;pointer-events:auto;
+  display:flex;align-items:center;gap:10px;padding:9px 10px 9px 20px;
+  background:rgba(13,15,16,.6);border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r-p);
+  box-shadow:0 8px 32px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
+  backdrop-filter:blur(24px) saturate(170%);-webkit-backdrop-filter:blur(24px) saturate(170%);
+  transition:background-color .32s var(--curva),box-shadow .32s var(--curva),border-color .32s var(--curva);
+}
+.nav.giu .guscio{background:rgba(13,15,16,.86);box-shadow:0 14px 44px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.07);
+  border-color:rgba(255,255,255,.1)}
+@media (max-width:1140px){ .nav{left:16px;right:16px} }
+
+.logo{display:flex;align-items:center;gap:0;min-height:44px;padding:0 4px}
+.logo .marchio-w{font-size:21px}
+.logo .o{width:.62em;height:.62em}
+.nav .link{margin-left:auto;display:flex;gap:2px;align-items:center}
+.nav .link a{font-size:14.5px;font-weight:450;color:var(--gri-2);padding:9px 14px;border-radius:var(--r-p);
+  transition:color var(--t-tocco) ease,background-color var(--t-tocco) ease}
+.nav .link a:hover{color:var(--bia);background:rgba(255,255,255,.06)}
+.nav .link a.btn:not(.ghost){color:var(--su-acc)}
+.nav .link a.btn.ghost{color:var(--gri-2)}
+.nav .link a.btn.ghost:hover{color:var(--bia)}
+
+
+/* ============================================================
+   1 · HERO — pulita. Una frase, una promessa, due bottoni.
+   ============================================================ */
+.hero{padding:186px 0 104px;position:relative;overflow:hidden}
+.hero .alone{inset:-52% -18% auto;height:1040px}
+.hero .g{position:relative;z-index:var(--z-corpo);max-width:820px}
+.hero .occhio{display:inline-flex;align-items:center;gap:9px;padding:7px 15px 7px 9px;
+  border-radius:var(--r-p);background:rgba(255,255,255,.05);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+  font-size:13.5px;color:var(--gri-2)}
+.hero .occhio .mon{width:17px}
+.hero h1{font-size:clamp(40px,6.4vw,78px);line-height:1.0;margin-top:26px;max-width:15ch}
+.hero .sub{color:var(--gri-2);max-width:52ch;margin-top:26px;font-size:19px;line-height:1.55}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:40px}
+.hero .sotto{margin-top:26px;color:var(--gri-3);font-size:14px;display:flex;gap:18px;flex-wrap:wrap}
+.hero .sotto span{display:flex;align-items:center;gap:8px}
+.hero .sotto .pt{width:5px;height:5px;border-radius:50%;background:var(--bra-hi);flex:none}
+
+/* ============================================================
+   IL RITMO
+   Una sola misura verticale per tutta la pagina. Le spaziature
+   a occhio, sezione per sezione, sono ciò che fa sembrare una
+   landing montata a pezzi.
+   ============================================================ */
+.sez{padding:132px 0;position:relative;z-index:var(--z-corpo)}
+.sez > .wrap > h2,
+.sez > .wrap > .titolone{max-width:20ch}
+.sez .micro{color:var(--gri-2);max-width:46ch;margin-top:20px;font-size:18px;line-height:1.55}
+.sez .visual{margin-top:56px}
+.sez .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:36px}
+
+/* sezioni chiare, per dare ritmo allo scorrimento */
+.sez.chiara{background:#0E1112;border-top:1px solid var(--bo);border-bottom:1px solid var(--bo)}
+
+@media (max-width:900px){
+  .sez{padding:84px 0}
+  .sez .visual{margin-top:38px}
+  .sez .micro{font-size:16.5px;margin-top:16px}
+}
+
+/* ============================================================
+   L'EROE
+   ============================================================ */
+.hero{padding:150px 0 96px;position:relative;overflow:hidden}
+.eroe{position:relative;z-index:var(--z-corpo);display:grid;
+  grid-template-columns:1.02fr .98fr;gap:36px;align-items:center}
+.eroe-testo{min-width:0}
+.eroe .occhietto{font-size:14.5px;color:var(--gri);letter-spacing:var(--tr-s)}
+.eroe h1{font-size:clamp(38px,5.6vw,70px);line-height:1.0;margin-top:18px;max-width:13ch}
+.eroe .sub{color:var(--gri-2);max-width:40ch;margin-top:20px;font-size:18.5px;line-height:1.55}
+.eroe .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.stretta{width:100%;max-width:500px;height:auto;justify-self:center;display:block;
+  filter:drop-shadow(0 26px 54px rgba(0,0,0,.6)) drop-shadow(0 0 80px rgba(var(--bra-rgb),.13))}
+@media (max-width:900px){
+  .hero{padding:112px 0 56px}
+  .eroe{grid-template-columns:1fr;gap:18px}
+  .eroe h1{max-width:none}
+  .stretta{max-width:330px;order:-1}
+}
+
+/* i tre badge sotto l'eroe */
+.tre-mosse{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;margin-top:8px;position:relative;z-index:var(--z-corpo)}
+.mossa{display:flex;align-items:center;gap:13px;padding:14px 18px;border-radius:var(--r-3);
+  background:var(--su-1);border:1px solid var(--bo);box-shadow:var(--filo)}
+.mossa .n{font-weight:700;font-size:17px;letter-spacing:var(--tr-l);text-transform:lowercase}
+.simbolo{width:46px;height:46px;flex:none;border-radius:var(--r-2);display:block;
+  background:var(--fondo);box-shadow:inset 0 0 0 1px var(--bo)}
+
+/* ============================================================
+   LE FOTO — sfondo trasparente, galleggiano sulla scena
+   ============================================================ */
+.foto{display:block;width:100%;max-width:480px;height:auto;margin:0 auto;
+  filter:drop-shadow(0 26px 54px rgba(0,0,0,.6))}
+.foto.piccola{max-width:440px}
+
+/* le foto con persone hanno un fondo: vanno in cornice */
+.scatto{border-radius:var(--r-4);overflow:hidden;border:1px solid rgba(255,255,255,.09);
+  box-shadow:var(--om-4), inset 0 1px 0 rgba(255,255,255,.07);position:relative}
+.scatto img{display:block;width:100%;height:auto}
+.scatto figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px 28px 22px;
+  background:linear-gradient(to top,rgba(4,5,6,.94),transparent);
+  font-size:15px;color:var(--gri-2)}
+.scatto figcaption b{color:var(--bia)}
+
+/* affiancare testo e visual */
+.duecol{display:grid;grid-template-columns:1fr 1.15fr;gap:52px;align-items:center}
+.duecol.girata{grid-template-columns:1.15fr 1fr}
+.duecol.girata .lato-testo{order:2}
+.duecol .lato-testo{min-width:0}
+.duecol h2{max-width:none}
+@media (max-width:940px){
+  .duecol,.duecol.girata{grid-template-columns:1fr;gap:34px}
+  .duecol.girata .lato-testo{order:0}
+}
+
+/* ============================================================
+   I MOCKUP — l'interfaccia vera, costruita in pagina.
+   Un solo guscio per tutti, così sembrano lo stesso prodotto.
+   ============================================================ */
+.mock{border-radius:var(--r-4);overflow:hidden;
+  border:1px solid rgba(255,255,255,.1);
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012)),var(--su-1);
+  box-shadow:var(--om-4), inset 0 1px 0 rgba(255,255,255,.08)}
+.mock-t{display:flex;align-items:center;gap:12px;padding:15px 20px;
+  border-bottom:1px solid var(--bo);font-size:12px;color:var(--gri-3);
+  letter-spacing:var(--tr-uc);text-transform:uppercase;font-weight:600}
+.mock-c{padding:22px}
+
+/* mattoncini riusati in più mockup */
+.ava-t{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:linear-gradient(170deg,var(--cre-hi),var(--cre));color:var(--su-cre)}
+.ava-t.azi{background:linear-gradient(170deg,var(--bra-hi),var(--bra));color:var(--su-bra)}
+.ava-t svg{width:56%;height:56%}
+.pilla{font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:var(--r-p);
+  white-space:nowrap;display:inline-block}
+.pilla.ok{background:var(--bra-hi);color:var(--su-bra)}
+.pilla.no{background:var(--velo);color:var(--gri);box-shadow:inset 0 0 0 1px var(--bo)}
+.pilla.att{background:rgba(var(--cre-rgb),.16);color:var(--cre)}
+.pilla.corso{color:var(--bra-hi);box-shadow:inset 0 0 0 1px rgba(var(--bra-rgb),.4)}
+
+/* --- l'intestazione di un profilo --- */
+.ap-testa{display:flex;align-items:center;gap:18px;padding:24px 22px;flex-wrap:wrap}
+.ap-ava{width:58px;height:58px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:linear-gradient(170deg,var(--cre-hi),var(--cre));color:var(--su-cre);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
+.ap-ava svg{width:56%;height:56%}
+.ap-chi{flex:1;min-width:0}
+.ap-chi .n{display:block;font-weight:700;font-size:21px;letter-spacing:var(--tr-l)}
+.ap-chi .h{display:block;color:var(--gri-3);font-size:13.5px;margin-top:3px;
+  font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.ap-pil{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}
+.ap-pil span{font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:var(--r-p)}
+.ap-pil .ok{background:var(--bra-hi);color:var(--su-bra)}
+.ap-pil .cerca{color:var(--bra-hi);box-shadow:inset 0 0 0 1px rgba(var(--bra-rgb),.4)}
+.ap-prezzo{text-align:right;flex:none}
+.ap-prezzo .k,.ap-prezzo .v{display:block}
+.ap-prezzo .k{font-size:11.5px;letter-spacing:var(--tr-uc);text-transform:uppercase;color:var(--gri-3)}
+.ap-prezzo .v{font-size:26px;font-weight:700;letter-spacing:-.035em;margin-top:5px}
+
+.ap-numeri{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--bo)}
+.ap-numeri div{padding:20px 22px;border-left:1px solid var(--bo)}
+.ap-numeri div:first-child{border-left:0}
+.ap-numeri .k{font-size:12px;color:var(--gri-3)}
+.ap-numeri .v{font-size:25px;font-weight:700;letter-spacing:-.035em;margin-top:7px;
+  font-variant-numeric:tabular-nums}
+
+.ap-stelle{display:inline-flex;gap:2px;flex:none}
+.ap-stelle svg{width:13px;height:13px;color:var(--bra-hi)}
+
+@media (max-width:700px){
+  .ap-prezzo{text-align:left}
+  .ap-numeri{grid-template-columns:1fr}
+  .ap-numeri div{border-left:0;border-top:1px solid var(--bo)}
+  .ap-numeri div:first-child{border-top:0}
+}
+
+/* --- esplora: cerca, filtri, schede --- */
+.mock-cerca{display:flex;align-items:center;gap:10px;padding:12px 15px;border-radius:var(--r-2);
+  background:var(--su-2);box-shadow:inset 0 0 0 1px var(--bo);color:var(--gri-3);font-size:14px}
+.mock-filtri{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.mock-filtri span{font-size:12.5px;padding:7px 14px;border-radius:var(--r-p);
+  background:var(--velo);box-shadow:inset 0 0 0 1px var(--bo);color:var(--gri-2)}
+.mock-filtri span.viva{background:var(--bra-hi);color:var(--su-bra);box-shadow:none;font-weight:600}
+.mock-schede{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.mini{padding:16px;border-radius:var(--r-3);background:var(--su-2);
+  box-shadow:inset 0 0 0 1px var(--bo)}
+.mini .cap{display:flex;align-items:center;gap:11px}
+.mini .n{font-weight:600;font-size:14px;line-height:1.25}
+.mini .h{color:var(--gri-3);font-size:12px;margin-top:2px;
+  font-variant-numeric:tabular-nums;letter-spacing:.01em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini .cap > div{min-width:0}
+.mini .r{display:flex;justify-content:space-between;margin-top:14px;padding-top:12px;
+  border-top:1px solid var(--bo);font-size:12.5px;color:var(--gri-3)}
+.mini .r b{color:var(--bra-hi);font-weight:700}
+.mini.scelta{box-shadow:inset 0 0 0 1px rgba(var(--bra-rgb),.5);
+  background:linear-gradient(180deg,rgba(18,196,172,.08),transparent 60%),var(--su-2)}
+@media (max-width:700px){ .mock-schede{grid-template-columns:1fr} }
+
+/* --- due mondi: due fotografie affiancate --- */
+.duemondi{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){ .duemondi{grid-template-columns:1fr} }
+
+/* --- il profilo che si riempie nel tempo --- */
+.crescita .passo-c{display:flex;align-items:center;gap:18px;padding:16px 0;
+  border-top:1px solid rgba(255,255,255,.055)}
+.crescita .passo-c:first-child{border-top:0}
+.crescita .q{width:130px;flex:none;font-size:13.5px;color:var(--gri-3)}
+.crescita .barre{flex:1;display:flex;gap:7px}
+.crescita .barre i{flex:1;height:10px;border-radius:5px;background:var(--velo);
+  box-shadow:inset 0 0 0 1px var(--bo)}
+.crescita .barre i.p{background:var(--bra-hi);box-shadow:none}
+.crescita .n{width:34px;text-align:right;flex:none;font-weight:700;font-size:19px;
+  font-variant-numeric:tabular-nums}
+@media (max-width:620px){
+  .crescita .passo-c{flex-wrap:wrap;gap:10px}
+  .crescita .q{width:auto}
+  .crescita .barre{order:3;width:100%;flex:none}
+}
+
+/* --- la linea del tempo: la sezione più importante --- */
+.linea{position:relative;padding:6px 0 6px 32px}
+.linea::before{content:"";position:absolute;left:7px;top:12px;bottom:12px;width:2px;
+  background:linear-gradient(180deg,var(--bra-hi),rgba(255,255,255,.07))}
+.nodo{position:relative;padding:14px 0}
+.nodo::before{content:"";position:absolute;left:-31px;top:22px;width:12px;height:12px;
+  border-radius:50%;background:var(--su-3);box-shadow:inset 0 0 0 2px var(--bo-2)}
+.nodo.viva::before{background:var(--bra-hi);box-shadow:0 0 0 4px rgba(var(--bra-rgb),.16)}
+.nodo .q{font-size:12px;color:var(--gri-3);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.nodo .riga{display:flex;align-items:center;gap:12px;margin-top:6px;flex-wrap:wrap}
+.nodo .n{font-weight:600;font-size:16.5px}
+.nodo .d{color:var(--gri-3);font-size:13.5px;margin-top:3px}
+.nodo.spenta{opacity:.5}
+
+/* --- lo zoom sui due badge --- */
+.badge-due{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.badge-c{padding:30px;border-radius:var(--r-3);text-align:center;
+  background:var(--su-1);box-shadow:inset 0 0 0 1px var(--bo)}
+.badge-c.viva{box-shadow:inset 0 0 0 1px rgba(var(--bra-rgb),.4);
+  background:linear-gradient(180deg,rgba(18,196,172,.08),transparent 62%),var(--su-1)}
+.badge-c .b{display:inline-block;font-size:15px;font-weight:700;padding:11px 22px;
+  border-radius:var(--r-p)}
+.badge-c.viva .b{background:var(--bra-hi);color:var(--su-bra)}
+.badge-c.spenta .b{background:var(--velo);color:var(--gri);box-shadow:inset 0 0 0 1px var(--bo)}
+.badge-c p{margin-top:18px;color:var(--gri);font-size:14.5px;line-height:1.55}
+@media (max-width:640px){ .badge-due{grid-template-columns:1fr} }
+
+/* --- il flusso della collaborazione --- */
+.flusso{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.flusso .f{padding:12px 18px;border-radius:var(--r-p);font-size:14.5px;font-weight:600;
+  background:var(--su-2);box-shadow:inset 0 0 0 1px var(--bo);white-space:nowrap}
+.flusso .f.fatta{background:rgba(var(--bra-rgb),.14);color:var(--bra-hi);
+  box-shadow:inset 0 0 0 1px rgba(var(--bra-rgb),.3)}
+.flusso .g{color:var(--gri-3);flex:none}
+
+/* --- la dashboard con gli stati --- */
+.dash .riga{display:flex;align-items:center;gap:16px;padding:15px 0;
+  border-top:1px solid rgba(255,255,255,.055)}
+.dash .riga:first-child{border-top:0}
+.dash .c{flex:1;min-width:0}
+.dash .c b{display:block;font-weight:600;font-size:15px}
+.dash .c span{display:block;color:var(--gri-3);font-size:13px;margin-top:2px}
+.dash .imp{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;flex:none}
+@media (max-width:620px){
+  .dash .riga{flex-wrap:wrap;gap:8px}
+  .dash .imp{margin-left:auto}
+}
+
+/* ============================================================
+   7 · CHIUSURA
+   ============================================================ */
+.fine{padding:132px 0 108px;text-align:center;position:relative;overflow:hidden;z-index:var(--z-corpo)}
+.fine .alone{inset:auto -18% -60%;height:900px}
+.fine .mon{width:64px;margin:0 auto 34px;display:block}
+.fine h2{font-size:clamp(32px,5.2vw,62px);line-height:1.04;max-width:16ch;margin:0 auto}
+.fine p{color:var(--gri-2);max-width:52ch;margin:24px auto 0;font-size:17.5px}
+.fine .cta{display:flex;gap:12px;justify-content:center;margin-top:38px;flex-wrap:wrap}
+
+.foot{padding:40px 0 56px;border-top:1px solid var(--bo);position:relative;z-index:var(--z-corpo);
+  display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.foot .marchio-w{font-size:17px;color:var(--gri-2)}
+.foot .o{width:.62em;height:.62em}
+.foot nav{display:flex;gap:22px;flex-wrap:wrap;margin-left:auto}
+.foot nav a{color:var(--gri-3);font-size:14.5px;transition:color var(--t-tocco) var(--e-std)}
+.foot nav a:hover{color:var(--bia)}
+.foot .c{color:var(--gri-3);font-size:14px}
+
+
+/* ============================================================
+   MOVIMENTO
+   Ogni animazione dice qualcosa: l'ordine di lettura, che un
+   elemento è toccabile, o che le due metà si sono chiuse.
+   ============================================================ */
+
+/* Niente animazione sull'alone: muovere uno strato grande quanto la
+   sezione costa un ridisegno per fotogramma, sempre, anche da fermi.
+   La luce sta ferma; a muoversi sono le cose che l'utente tocca. */
+
+/* le schede si sollevano appena sotto il puntatore */
+.tessera,.passo,.sicuro .v,.doc,.pz{
+  transition:transform .3s var(--e-std),border-color .3s var(--e-std),box-shadow .3s var(--e-std)}
+@media (hover:hover){
+  .tessera:hover,.passo:hover,.sicuro .v:hover,.doc:hover,.pz:not(.spento):hover{
+    transform:translateY(-3px);border-color:var(--bo-2);box-shadow:var(--om-3),var(--filo)}
+}
+
+/* la demo del prodotto entra come un oggetto solido, non come un fade */
+@keyframes telaio-in{from{opacity:0;transform:perspective(1400px) rotateX(4deg) translateY(34px) scale(.985)}
+                     to{opacity:1;transform:none}}
+.telaio.in{animation:telaio-in .9s var(--e-std) both}
+
+/* le card della demo si compongono dopo il telaio */
+.telaio.in .cardino{animation:vista-entra .5s var(--e-std) both}
+.telaio.in .cardino:nth-of-type(2){animation-delay:.12s}
+.telaio.in .tasca{animation:vista-entra .5s var(--e-std) both;animation-delay:.08s}
+.telaio.in .saldo .q{animation:cifra-su .6s var(--e-molla) both;animation-delay:.14s}
+
+/* il percorso nelle card si accende tappa per tappa */
+.telaio.in .percorso .tappa.fatta .pallino{animation:cifra-su .45s var(--e-molla) both}
+.telaio.in .percorso .tappa:nth-child(2) .pallino{animation-delay:.1s}
+
+/* le pastiglie della nicchia scattano al tocco */
+.nicchia span,.marchi .m{transition:transform .2s var(--e-molla),background-color .2s var(--e-std)}
+.nicchia span:active,.marchi .m:active{transform:scale(.95)}
+
+/* il logo nella barra: le due metà si aprono al passaggio */
+@media (hover:hover){
+  .logo .o::before,.logo .o::after{transition:transform .4s var(--e-molla)}
+  .logo:hover .o::before{transform:translateY(-2px)}
+  .logo:hover .o::after{transform:translateY(2px)}
+}
+
+/* i link della barra: il fondo cresce dal centro */
+.nav .link a:not(.btn){position:relative;overflow:hidden}
+
+@media (prefers-reduced-motion:reduce){
+  .telaio.in,.telaio.in *{animation:none!important}
+}
+
+/* ============================================================
+   ADATTAMENTI
+   ============================================================ */
+/* --- TABLET --------------------------------------------------- */
+@media (max-width:900px){
+  .nav .link a:not(.btn){display:none}
+  .colonne{grid-template-columns:repeat(3,1fr)}
+  .foot nav{margin-left:0;gap:16px}
+}
+
+/* --- TELEFONO -------------------------------------------------
+   Rifatto sui componenti che la pagina usa davvero. La regola:
+   una misura sola per ogni cosa, e niente che scenda sotto il
+   bersaglio del pollice.
+   -------------------------------------------------------------- */
+@media (max-width:640px){
+
+  /* ritmo: sezioni più corte, ma tutte uguali */
+  .sez{padding:74px 0}
+  .sez .visual{margin-top:30px}
+  .sez .micro{font-size:16px;margin-top:14px;max-width:none}
+  .sez .cta{margin-top:26px}
+
+  /* tipografia: due misure, non cinque */
+  .eroe h1{font-size:34px;line-height:1.05;margin-top:14px}
+  .sez h2,.sez .disp-m{font-size:28px;line-height:1.1;max-width:none}
+  .sez h2.disp,.sez .disp{font-size:30px!important;line-height:1.08}
+  .fine h2{font-size:30px}
+
+  /* l'eroe: prima il testo, poi l'immagine. Con l'immagine in cima
+     il titolo finiva sotto la piega e la pagina si apriva sul vuoto. */
+  .hero{padding:104px 0 44px}
+  .eroe{gap:26px}
+  .stretta{order:0;max-width:270px;
+    filter:drop-shadow(0 14px 30px rgba(0,0,0,.55))}
+  .eroe .sub{font-size:16.5px;margin-top:16px;max-width:none}
+  .eroe .cta{flex-direction:column;align-items:stretch;margin-top:24px}
+  .eroe .cta .btn{width:100%}
+
+  /* i tre badge: più bassi, il simbolo più piccolo */
+  .tre-mosse{gap:9px;margin-top:26px}
+  .mossa{padding:11px 14px;gap:12px}
+  .simbolo{width:38px;height:38px;border-radius:var(--r-1)}
+  .mossa .n{font-size:16px}
+
+  /* le colonne affiancate diventano una, con un respiro giusto */
+  .duecol,.duecol.girata{gap:28px}
+  .duemondi{gap:12px}
+
+  /* le foto */
+  .foto{max-width:300px}
+  .scatto figcaption{padding:18px 16px 14px;font-size:14px}
+
+  /* i mockup: meno imbottitura, così il contenuto respira */
+  .mock-t{padding:12px 16px;font-size:11px}
+  .mock-c{padding:16px}
+
+  /* profilo: l'intestazione va a capo, i numeri restano in riga */
+  .ap-testa{padding:18px 16px;gap:14px}
+  .ap-ava{width:48px;height:48px}
+  .ap-chi .n{font-size:18px}
+  .ap-chi .h{font-size:12.5px}
+  .ap-prezzo{width:100%;text-align:left;display:flex;align-items:baseline;gap:10px}
+  .ap-prezzo .k{margin:0}
+  .ap-prezzo .v{font-size:21px;margin:0}
+  /* tre numeri impilati occupavano 565px: restano in riga, più piccoli */
+  .ap-numeri{grid-template-columns:repeat(3,1fr)}
+  .ap-numeri div{border-left:1px solid var(--bo);border-top:0;padding:14px 10px}
+  .ap-numeri div:first-child{border-left:0}
+  .ap-numeri .k{font-size:11px;line-height:1.3}
+  .ap-numeri .v{font-size:19px;margin-top:5px}
+
+  /* esplora */
+  .mock-cerca{font-size:13.5px;padding:11px 13px}
+  .mock-filtri span{font-size:12px;padding:6px 12px}
+  .mini{padding:14px}
+
+  /* la linea del tempo */
+  .linea{padding-left:26px}
+  .linea::before{left:5px}
+  .nodo{padding:11px 0}
+  .nodo::before{left:-25px;top:19px;width:10px;height:10px}
+  .nodo .n{font-size:15.5px}
+  .nodo .d{font-size:13px}
+  .nodo .riga{gap:9px}
+  .ap-stelle svg{width:12px;height:12px}
+
+  /* i due badge a confronto */
+  .badge-c{padding:22px}
+  .badge-c .b{font-size:14px;padding:9px 18px}
+  .badge-c p{margin-top:14px;font-size:14px}
+
+  /* il flusso: senza frecce, due colonne. Le frecce mandate a capo
+     sembravano refusi. */
+  .flusso{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .flusso .g{display:none}
+  .flusso .f{font-size:13.5px;padding:11px 12px;text-align:center;
+    border-radius:var(--r-2);white-space:normal}
+
+  /* la dashboard */
+  .dash .riga{gap:12px;padding:13px 0}
+  .dash .c b{font-size:14.5px}
+  .dash .imp{font-size:14.5px}
+  .ava-t{width:34px;height:34px}
+
+  /* il profilo che si riempie */
+  .crescita .q{font-size:13px}
+  .crescita .n{font-size:17px;width:28px}
+
+  /* la chiusura */
+  .fine{padding:88px 0 76px}
+  .fine .cta{flex-direction:column;align-items:stretch}
+  .fine .cta .btn{width:100%}
+  .fine .mon{width:52px;margin-bottom:26px}
+
+  .foot{gap:16px;padding:32px 0 44px}
+  .foot nav{width:100%;gap:14px 18px}
+}
+
+/* --- schermi molto stretti --- */
+@media (max-width:359px){
+  .wrap{padding:0 16px}
+  .hero{padding:96px 0 40px}
+  .eroe h1{font-size:30px}
+  .sez h2,.sez .disp-m{font-size:25px}
+  .nav .guscio{padding:8px 8px 8px 16px}
+  .logo .marchio-w{font-size:19px}
+  .stretta{max-width:230px}
+  .ap-numeri .v{font-size:17px}
+  .flusso{grid-template-columns:1fr}
+}
+
+.vis-off{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+</style>
+</head>
+<body>
+
+<div class="colonne" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<nav class="nav" id="nav">
+  <div class="guscio">
+    <a class="logo" href="index.html" aria-label="Leucoteo, torna in cima">
+      <span class="marchio-w">leuc<span class="o" aria-hidden="true"></span>te<span aria-hidden="true">o</span></span>
+    </a>
+    <div class="link">
+      <a href="#storico">Lo storico</a>
+      <a href="#creator">Creator</a>
+      <a href="#aziende">Aziende</a>
+      <a href="#come">Come funziona</a>
+      <a class="btn p ghost tap" href="accedi.html">Accedi</a>
+      <a class="btn p tap" href="entra.html">Iscriviti</a>
+    </div>
+  </div>
+</nav>
+
+<!-- 1 · HERO -->
+<header class="hero">
+  <div class="alone" aria-hidden="true"></div>
+  <div class="wrap eroe">
+    <div class="eroe-testo">
+      <h1 class="disp rise">Le collaborazioni, finalmente in un unico posto.</h1>
+      <p class="sub rise"><b style="color:var(--bia)">Trova. Valuta. Collabora.</b><br>
+        Leucoteo connette creator e aziende in modo più semplice e trasparente.</p>
+      <div class="cta rise">
+        <a class="btn tap" href="entra.html">Sono un creator</a>
+        <a class="btn due tap" href="entra.html">Sono un&rsquo;azienda</a>
+      </div>
+    </div>
+    <img class="stretta rise" src="assets/img/landing/stretta.png"
+      alt="Una mano ambra e una acquamarina che si stringono" decoding="async">
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tre-mosse">
+    <div class="mossa rise"><video class="simbolo" src="assets/video/simbolo-trova.mp4" autoplay muted loop playsinline aria-hidden="true"></video><div class="n">trova</div></div>
+    <div class="mossa rise"><video class="simbolo" src="assets/video/simbolo-valuta.mp4" autoplay muted loop playsinline aria-hidden="true"></video><div class="n">valuta</div></div>
+    <div class="mossa rise"><video class="simbolo" src="assets/video/simbolo-patto.mp4" autoplay muted loop playsinline aria-hidden="true"></video><div class="n">collabora</div></div>
+  </div>
+</div>
+
+<!-- 2 · IL PROBLEMA -->
+<section class="sez" id="problema">
+  <div class="wrap duecol">
+    <div class="lato-testo">
+      <h2 class="disp-m rise">Oggi collaborare è più complicato di quanto dovrebbe.</h2>
+      <p class="micro rise">Email ignorate. DM persi. Media kit. Screenshot. Fogli Excel.</p>
+    </div>
+    <img class="foto rise" src="assets/img/landing/caos.png"
+      alt="Messaggi, fogli e schermate sparsi che confluiscono in un'unica lastra ordinata" loading="lazy" decoding="async">
+  </div>
+</section>
+
+<!-- 3 · DUE MONDI, UN SOLO POSTO -->
+<section class="sez chiara" id="mondi">
+  <div class="wrap">
+    <h2 class="disp-m rise">Creator cercano aziende. Aziende cercano creator.</h2>
+    <p class="micro rise">Leucoteo mette entrambi nello stesso spazio.</p>
+
+    <div class="visual duemondi">
+      <figure class="scatto rise">
+        <img src="assets/img/landing/creator.jpg" alt="Una creator che filma un prodotto" loading="lazy" decoding="async">
+        <figcaption><b>Creator</b> · cerca aziende</figcaption>
+      </figure>
+      <figure class="scatto rise">
+        <img src="assets/img/landing/reputazione.jpg" alt="Il titolare di un piccolo marchio al computer" loading="lazy" decoding="async">
+        <figcaption><b>Azienda</b> · cerca creator</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · DISCOVERY -->
+<section class="sez" id="scopri">
+  <div class="wrap duecol girata">
+    <div class="lato-testo">
+      <h2 class="disp-m rise">Non cercare più alla cieca.</h2>
+      <p class="micro rise">Scopri creator e aziende già interessati a collaborare.</p>
+    </div>
+    <div class="mock rise">
+      <div class="mock-t">esplora</div>
+      <div class="mock-c">
+        <div class="mock-cerca">Cerca per nome o categoria</div>
+        <div class="mock-filtri"><span class="viva">in cerca</span><span>nutrizione</span>
+          <span>fitness</span><span>verificati</span></div>
+        <div class="mock-schede">
+          <div class="mini "><div class="cap"><span class="ava-t"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.1" r="4.05"/><path d="M12 13.6c-4.3 0-7.7 2.9-8 6.6-.03.4.3.8.7.8h14.6c.4 0 .73-.4.7-.8-.3-3.7-3.7-6.6-8-6.6Z"/></svg></span>
+            <div><div class="n">Giulia Ferrante</div><div class="h">@giulia.fit</div></div></div>
+            <div class="r"><span>giudizio</span><b>4,9</b></div></div>
+          <div class="mini "><div class="cap"><span class="ava-t"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.1" r="4.05"/><path d="M12 13.6c-4.3 0-7.7 2.9-8 6.6-.03.4.3.8.7.8h14.6c.4 0 .73-.4.7-.8-.3-3.7-3.7-6.6-8-6.6Z"/></svg></span>
+            <div><div class="n">Sara Ferro</div><div class="h">@sara.runs</div></div></div>
+            <div class="r"><span>giudizio</span><b>5,0</b></div></div>
+          <div class="mini "><div class="cap"><span class="ava-t"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.1" r="4.05"/><path d="M12 13.6c-4.3 0-7.7 2.9-8 6.6-.03.4.3.8.7.8h14.6c.4 0 .73-.4.7-.8-.3-3.7-3.7-6.6-8-6.6Z"/></svg></span>
+            <div><div class="n">Elisa Conti</div><div class="h">@elisa.wellness</div></div></div>
+            <div class="r"><span>giudizio</span><b>4,7</b></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · PROFILO CREATOR -->
+<section class="sez chiara" id="profilo">
+  <div class="wrap">
+    <h2 class="disp-m rise">Molto più di follower e visualizzazioni.</h2>
+    <p class="micro rise">Un profilo pensato per raccontare chi sei, cosa hai fatto
+      e con chi hai lavorato.</p>
+
+    <div class="visual mock rise">
+      <div class="mock-t">profilo</div>
+      <div class="ap-testa">
+        <span class="ap-ava" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.1" r="4.05"/><path d="M12 13.6c-4.3 0-7.7 2.9-8 6.6-.03.4.3.8.7.8h14.6c.4 0 .73-.4.7-.8-.3-3.7-3.7-6.6-8-6.6Z"/></svg></span>
+        <span class="ap-chi">
+          <span class="n">Giulia Ferrante</span>
+          <span class="h">@giulia.fit · Bologna · nutrizione</span>
+          <span class="ap-pil"><span class="ok">verificato</span><span class="cerca">in cerca</span></span>
+        </span>
+        <span class="ap-prezzo"><span class="k">a partire da</span><span class="v">€ 450</span></span>
+      </div>
+      <div class="ap-numeri">
+        <div><div class="k">Collaborazioni</div><div class="v acc">9</div></div>
+        <div><div class="k">Consegne in tempo</div><div class="v">100%</div></div>
+        <div><div class="k">Giudizio</div><div class="v">4,9</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 · LO STORICO · feature centrale -->
+<section class="sez" id="storico">
+  <div class="wrap">
+    <h2 class="disp rise" style="font-size:clamp(34px,5.4vw,62px)">Il passato racconta con chi stai per lavorare.</h2>
+    <p class="micro rise">Consulta lo storico delle collaborazioni prima di iniziarne una nuova.</p>
+
+    <div class="visual mock rise">
+      <div class="mock-t">storico delle collaborazioni</div>
+      <div class="mock-c">
+        <div class="linea">
+          <div class="nodo viva"><div class="q">lug 2026</div>
+            <div class="riga"><span class="n">Pura Skin</span><span class="pilla ok">verificata</span><span class="ap-stelle"><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg></span></div>
+            <div class="d">1 reel + 2 storie · consegnata in tempo</div></div>
+          <div class="nodo viva"><div class="q">mag 2026</div>
+            <div class="riga"><span class="n">Caffè Mora</span><span class="pilla ok">verificata</span><span class="ap-stelle"><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg></span></div>
+            <div class="d">1 reel + 3 storie · rinnovata due volte</div></div>
+          <div class="nodo viva"><div class="q">mar 2026</div>
+            <div class="riga"><span class="n">un&rsquo;azienda di benessere</span><span class="pilla ok">verificata</span><span class="ap-stelle"><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95Z"/></svg></span></div>
+            <div class="d">3 storie · consegnata in tempo</div></div>
+          <div class="nodo spenta"><div class="q">feb 2026</div>
+            <div class="riga"><span class="n">FitBox Italia</span><span class="pilla no">dichiarata</span></div>
+            <div class="d">2 reel</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · VERIFICATO VS DICHIARATO -->
+<section class="sez chiara" id="verifica">
+  <div class="wrap duecol">
+    <div class="lato-testo">
+      <h2 class="disp-m rise">Sai sempre cosa stai guardando.</h2>
+      <p class="micro rise">Leucoteo distingue chiaramente le informazioni verificate
+        da quelle semplicemente dichiarate.</p>
+    </div>
+    <div class="badge-due rise">
+      <div class="badge-c viva"><span class="b">verificata</span>
+        <p>È passata da Leucoteo: c&rsquo;è un accordo, una consegna datata e un giudizio.</p></div>
+      <div class="badge-c spenta"><span class="b">dichiarata</span>
+        <p>L&rsquo;ha scritta il creator. Non l&rsquo;abbiamo vista succedere.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · PER LE AZIENDE -->
+<section class="sez" id="aziende">
+  <div class="wrap duecol girata">
+    <div class="lato-testo">
+      <h2 class="disp-m rise">Più informazioni. Decisioni migliori.</h2>
+      <p class="micro rise">Confronta creator, consulta il loro storico e scegli a chi
+        affidare le tue collaborazioni.</p>
+      <div class="cta rise"><a class="btn due tap" href="entra.html">Scopri i creator</a></div>
+    </div>
+    <div class="mock rise">
+      <div class="mock-t">confronto</div>
+      <div class="mock-c">
+        <div class="mock-schede">
+          <div class="mini scelta"><div class="cap"><span class="ava-t"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.1" r="4.05"/><path d="M12 13.6c-4.3 0-7.7 2.9-8 6.6-.03.4.3.8.7.8h14.6c.4 0 .73-.4.7-.8-.3-3.7-3.7-6.6-8-6.6Z"/></svg></span>
+            <div><div class="n">Giulia Ferrante</div><div class="h">@giulia.fit</div></div></div>
+            <div class="r"><span>collaborazioni</span><b>9</b></div></div>
+          <div class="mini "><div class="cap"><span class="ava-t"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.1" r="4.05"/><path d="M12 13.6c-4.3 0-7.7 2.9-8 6.6-.03.4.3.8.7.8h14.6c.4 0 .73-.4.7-.8-.3-3.7-3.7-6.6-8-6.6Z"/></svg></span>
+            <div><div class="n">Marco Bandini</div><div class="h">@marcolifts</div></div></div>
+            <div class="r"><span>collaborazioni</span><b>14</b></div></div>
+          <div class="mini "><div class="cap"><span class="ava-t"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.1" r="4.05"/><path d="M12 13.6c-4.3 0-7.7 2.9-8 6.6-.03.4.3.8.7.8h14.6c.4 0 .73-.4.7-.8-.3-3.7-3.7-6.6-8-6.6Z"/></svg></span>
+            <div><div class="n">Dario Sala</div><div class="h">@dario.crossfit</div></div></div>
+            <div class="r"><span>collaborazioni</span><b>3</b></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 · PER I CREATOR -->
+<section class="sez chiara" id="creator">
+  <div class="wrap duecol">
+    <div class="lato-testo">
+      <h2 class="disp-m rise">Il tuo lavoro non riparte da zero ogni volta.</h2>
+      <p class="micro rise">Ogni collaborazione può contribuire a costruire il tuo
+        profilo professionale.</p>
+      <div class="cta rise"><a class="btn tap" href="entra.html">Crea il tuo profilo</a></div>
+    </div>
+    <div class="mock rise">
+      <div class="mock-t">il profilo, nel tempo</div>
+      <div class="mock-c crescita">
+        <div class="passo-c"><span class="q">all&rsquo;inizio</span>
+          <span class="barre"><i></i><i class="v"></i><i class="v"></i><i class="v"></i></span>
+          <span class="n gri">0</span></div>
+        <div class="passo-c"><span class="q">dopo un mese</span>
+          <span class="barre"><i class="p"></i><i class="p"></i><i class="v"></i><i class="v"></i></span>
+          <span class="n">2</span></div>
+        <div class="passo-c"><span class="q">dopo sei mesi</span>
+          <span class="barre"><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i></span>
+          <span class="n acc">9</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · GESTIONE DELLA COLLABORAZIONE -->
+<section class="sez" id="come">
+  <div class="wrap">
+    <h2 class="disp-m rise">Dall&rsquo;accordo alla consegna. Tutto qui.</h2>
+    <div class="visual mock rise">
+      <div class="mock-t">una collaborazione</div>
+      <div class="mock-c">
+        <div class="flusso">
+          <span class="f fatta">Richiesta</span><span class="g">→</span>
+          <span class="f fatta">Accordo</span><span class="g">→</span>
+          <span class="f fatta">Consegna</span><span class="g">→</span>
+          <span class="f">Approvazione</span><span class="g">→</span>
+          <span class="f">Pagamento</span><span class="g">→</span>
+          <span class="f">Conclusa</span>
+        </div>
+      </div>
+    </div>
+    <p class="gri xs rise" style="margin-top:20px">Il pagamento avviene direttamente
+      tra creator e azienda.</p>
+  </div>
+</section>
+
+<!-- 11 · TUTTO SOTTO CONTROLLO -->
+<section class="sez chiara" id="controllo">
+  <div class="wrap duecol girata">
+    <div class="lato-testo">
+      <h2 class="disp-m rise">Sai sempre a che punto siete.</h2>
+      <p class="micro rise">Collaborazioni attive, richieste, consegne e accordi
+        organizzati in un&rsquo;unica dashboard.</p>
+    </div>
+    <div class="mock rise">
+      <div class="mock-t">collaborazioni</div>
+      <div class="mock-c dash">
+        <div class="riga"><span class="ava-t"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.1" r="4.05"/><path d="M12 13.6c-4.3 0-7.7 2.9-8 6.6-.03.4.3.8.7.8h14.6c.4 0 .73-.4.7-.8-.3-3.7-3.7-6.6-8-6.6Z"/></svg></span>
+          <span class="c"><b>Giulia Ferrante</b><span>Lancio proteine vegetali</span></span>
+          <span class="pilla att">da approvare</span><span class="imp">€ 600</span></div>
+        <div class="riga"><span class="ava-t"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.1" r="4.05"/><path d="M12 13.6c-4.3 0-7.7 2.9-8 6.6-.03.4.3.8.7.8h14.6c.4 0 .73-.4.7-.8-.3-3.7-3.7-6.6-8-6.6Z"/></svg></span>
+          <span class="c"><b>Sara Ferro</b><span>Barrette proteiche</span></span>
+          <span class="pilla corso">in consegna</span><span class="imp">€ 380</span></div>
+        <div class="riga"><span class="ava-t"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.1" r="4.05"/><path d="M12 13.6c-4.3 0-7.7 2.9-8 6.6-.03.4.3.8.7.8h14.6c.4 0 .73-.4.7-.8-.3-3.7-3.7-6.6-8-6.6Z"/></svg></span>
+          <span class="c"><b>Elisa Conti</b><span>Routine post-workout</span></span>
+          <span class="pilla ok">conclusa</span><span class="imp">€ 350</span></div>
+        <div class="riga"><span class="ava-t azi"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 3.6h17.2l1.15 3.75a3.05 3.05 0 0 1-5.87.92 3.05 3.05 0 0 1-6.06 0 3.05 3.05 0 0 1-5.87-.92L3.4 3.6Z"/><path d="M4.9 12.05V19.7c0 .4.3.7.7.7h3.55v-4.45h5.7v4.45h3.55c.4 0 .7-.3.7-.7v-7.65a4.75 4.75 0 0 1-3.55-1.06 4.75 4.75 0 0 1-6.55 0 4.75 4.75 0 0 1-4.1 1.06Z"/></svg></span>
+          <span class="c"><b>Verde Vivo</b><span>Richiesta ricevuta</span></span>
+          <span class="pilla no">da leggere</span><span class="imp">€ 400</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 · REPUTAZIONE -->
+<section class="sez" id="reputazione">
+  <div class="wrap duecol">
+    <div class="lato-testo">
+      <h2 class="disp rise" style="font-size:clamp(32px,4.8vw,56px)">Ogni collaborazione lascia qualcosa.</h2>
+      <p class="micro rise">Il lavoro fatto oggi costruisce lo storico con cui ti
+        presenterai domani.</p>
+    </div>
+    <div class="mock rise">
+      <div class="mock-t">lo storico, mese dopo mese</div>
+      <div class="mock-c">
+        <div class="linea">
+          <div class="nodo viva"><div class="q">oggi</div>
+            <div class="riga"><span class="n">la prossima</span></div></div>
+          <div class="nodo viva"><div class="q">lug 2026</div>
+            <div class="riga"><span class="n">Pura Skin</span></div></div>
+          <div class="nodo viva"><div class="q">mag 2026</div>
+            <div class="riga"><span class="n">Caffè Mora</span></div></div>
+          <div class="nodo viva"><div class="q">mar 2026</div>
+            <div class="riga"><span class="n">un&rsquo;azienda di benessere</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 · CTA FINALE -->
+<section class="fine">
+  <div class="alone" aria-hidden="true"></div>
+  <div class="wrap">
+    <span class="mon" id="monFine"></span>
+    <h2 class="disp rise">La prossima collaborazione potrebbe iniziare qui.</h2>
+    <p class="rise">Creator e aziende stanno costruendo un modo diverso di collaborare.</p>
+    <div class="cta rise">
+      <a class="btn tap" href="entra.html">Entra come creator</a>
+      <a class="btn due tap" href="entra.html">Entra come azienda</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer class="foot">
+    <span class="marchio-w">leuc<span class="o" aria-hidden="true"></span>te<span aria-hidden="true">o</span></span>
+    <nav>
+      <a href="#storico">Lo storico</a>
+      <a href="#come">Come funziona</a>
+      <a href="accedi.html">Accedi</a>
+      <a href="entra.html">Iscriviti</a>
+      <a href="termini.html">Termini</a>
+    </nav>
+    <span class="c">© Leucoteo</span>
+  </footer>
+</div>
+
+<script type="module">
+import { MONETA_SVG, osserva } from './assets/moto.js';
+
+/* Segni decorativi: se una sezione viene riscritta e uno di questi
+   sparisce, non deve portarsi dietro tutta la pagina. */
+const monta = (id) => { const e = document.getElementById(id); if (e) e.innerHTML = MONETA_SVG; };
+monta('monOcchio');
+monta('monFine');
+
+/* --- entrate sfalsate --- */
+osserva();
+
+/* --- la barra si posa quando scorri --- */
+const nav = document.getElementById('nav');
+addEventListener('scroll', () => nav.classList.toggle('giu', scrollY > 16), { passive: true });
+
+/* --- il segno finale: le due metà si ricompongono quando arriva in vista.
+       È la stessa grammatica che dentro il prodotto significa "pagato". --- */
+const monFine = document.getElementById('monFine');
+if (monFine && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  new IntersectionObserver((voci, io) => {
+    voci.forEach(v => { if (v.isIntersecting) { setTimeout(() => monFine.classList.add('on'), 320); io.disconnect(); } });
+  }, { threshold: .6 }).observe(monFine);
+} else if (monFine) {
+  monFine.classList.add('on');
+}
+</script>
+</body>
+</html>

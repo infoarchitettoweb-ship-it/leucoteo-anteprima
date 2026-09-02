@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Leucoteo — accedi</title>
+<meta name="description" content="Entra nel tuo account Leucoteo.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800&family=Poppins:wght@600&display=swap">
+<link rel="stylesheet" href="assets/stile.css">
+<script>document.documentElement.classList.add('con-script');</script>
+<style>
+.marchio-w{font-size:18px}
+
+/* Una colonna sola, stretta, centrata: in una pagina di accesso
+   non c'è niente da confrontare, quindi non c'è niente da mettere
+   di fianco. */
+.accesso{max-width:430px;margin:0 auto;padding:8vh 0 60px}
+.accesso h1{font-size:clamp(30px,5vw,40px)}
+.accesso .occhiello{margin-top:16px}
+
+.riga-fra{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.riga-fra a{font-size:13px;color:var(--gri);text-decoration:underline;text-underline-offset:3px}
+.riga-fra a:hover{color:var(--bia)}
+
+/* la riga che separa l'accesso con la password dagli altri modi */
+.oppure{display:flex;align-items:center;gap:14px;margin:30px 0;
+  color:var(--gri-3);font-size:12.5px;letter-spacing:var(--tr-uc);text-transform:uppercase}
+.oppure::before,.oppure::after{content:"";flex:1;height:1px;background:var(--bo)}
+
+.piede-accesso{margin-top:34px;padding-top:24px;border-top:1px solid var(--bo);
+  color:var(--gri);font-size:14.5px;text-align:center}
+.piede-accesso a{color:var(--acc);font-weight:600}
+.piede-accesso a:hover{text-decoration:underline}
+</style>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M48 13 A43 43 0 0 0 48 99 Z' fill='%23FFB020'/%3E%3Cpath d='M52 1 A43 43 0 0 1 52 87 Z' fill='%233AE7CD'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<div class="colonne" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<div class="entra">
+  <header class="entra-alto">
+    <div class="wrap riga tra">
+      <a class="riga" href="index.html" style="gap:9px;min-height:44px;padding:0 4px" aria-label="Leucoteo, torna al sito">
+        <span class="mon on" id="marchio" style="width:19px"></span>
+        <span class="marchio-w">leuc<span class="o" aria-hidden="true"></span>te<span aria-hidden="true">o</span></span>
+      </a>
+      <a class="btn p ghost" href="entra.html">Iscriviti</a>
+    </div>
+  </header>
+
+  <main class="entra-corpo">
+    <div class="wrap">
+      <div class="accesso">
+        <h1 class="rise">bentornato</h1>
+        <p class="occhiello rise">Entra e riprendi da dove eri. Se non hai ancora un account,
+          l&rsquo;iscrizione è gratuita: Leucoteo è in beta e non chiede nessuna carta.</p>
+
+        <form class="modulo rise" id="modulo" style="margin-top:30px">
+          <div class="campi">
+            <div class="campo-g">
+              <label class="etichetta" for="fEmail">Email</label>
+              <input class="campo" id="fEmail" type="email" autocomplete="email"
+                     placeholder="tu@esempio.it" required>
+            </div>
+            <div class="campo-g">
+              <div class="riga-fra">
+                <label class="etichetta" for="fPass">Password</label>
+                <a href="#" data-avviso="Ti abbiamo mandato un link per rifarla">Non la ricordi?</a>
+              </div>
+              <input class="campo" id="fPass" type="password" autocomplete="current-password" required>
+            </div>
+          </div>
+
+          <button class="btn pieno" type="submit" style="margin-top:26px">Accedi</button>
+        </form>
+
+        <div class="oppure rise">oppure</div>
+
+        <div class="pila rise" style="gap:10px">
+          <button class="btn ghost pieno" data-lato="creator">Entra nella prova · lato creator</button>
+          <button class="btn ghost pieno" data-lato="azienda">Entra nella prova · lato azienda</button>
+        </div>
+        <p class="gri xs rise" style="margin-top:14px;text-align:center">
+          Leucoteo è ancora un prototipo: da qui entri nella dimostrazione con dati di esempio.</p>
+
+        <p class="piede-accesso rise">
+          Non hai un account? <a href="entra.html">Iscriviti, è gratis</a>
+        </p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="avviso" id="avviso" role="status" aria-live="polite"></div>
+
+<script type="module">
+import { MONETA_SVG, osserva } from './assets/moto.js';
+
+document.getElementById('marchio').innerHTML = MONETA_SVG;
+osserva();
+
+const avviso = (t) => {
+  const a = document.getElementById('avviso');
+  a.textContent = t; a.classList.add('qui');
+  clearTimeout(a._t); a._t = setTimeout(() => a.classList.remove('qui'), 2600);
+};
+
+/* Non c'è ancora un backend: l'accesso porta nella dimostrazione.
+   Il lato lo si sceglie qui, perché dentro l'app non si cambia più
+   — e non deve cambiarsi, non è una cosa vera. */
+document.getElementById('modulo').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const email = document.getElementById('fEmail').value.trim();
+  const pass = document.getElementById('fPass').value;
+  if (!email || !email.includes('@')) return avviso('Serve un indirizzo email valido');
+  if (!pass) return avviso('Serve la password');
+  avviso('Accesso in corso…');
+  setTimeout(() => { location.href = 'app.html?lato=creator'; }, 700);
+});
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-lato],[data-avviso]');
+  if (!b) return;
+  if (b.dataset.lato) { location.href = `app.html?lato=${b.dataset.lato}`; return; }
+  e.preventDefault();
+  avviso(b.dataset.avviso);
+});
+</script>
+</body>
+</html>

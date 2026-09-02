@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Leucoteo — entra</title>
+<meta name="description" content="Scegli da che parte stai, e comincia. Leucoteo è in beta: gratis, zero commissioni.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800&family=Poppins:wght@600&display=swap">
+<link rel="stylesheet" href="assets/stile.css">
+<script>document.documentElement.classList.add('con-script');</script>
+<style>
+.filmato-reg{display:block;width:100%;max-width:560px;margin:0 auto 30px;
+  border:1px solid var(--lin);background:var(--su-2)}
+.fine-reg{max-width:620px}
+.marchio-w{font-size:18px}
+
+/* il fascio della beta: la prima cosa che si legge, e resta */
+.fascia-beta{display:inline-flex;align-items:center;gap:10px;padding:9px 16px;
+  border-radius:var(--r-p);background:rgba(var(--acc-rgb),.1);
+  box-shadow:inset 0 0 0 1px rgba(var(--acc-rgb),.28);
+  font-size:13.5px;color:var(--acc);margin-bottom:20px}
+.fascia-beta b{color:var(--acc)}
+
+/* il cancello: il numero letto da Instagram, grande abbastanza
+   da essere il soggetto della schermata e non una nota */
+.cancello{text-align:center;padding:34px 26px;border-radius:var(--r-3);
+  background:var(--su-2);border:1px solid var(--bo);margin-top:26px}
+.cancello .q{font-size:clamp(40px,7vw,58px);font-weight:800;letter-spacing:-.04em;
+  line-height:1;font-variant-numeric:tabular-nums}
+.cancello .q.ok{color:var(--acc)}
+.cancello .q.no{color:var(--bra-hi)}
+.cancello .k{color:var(--gri);font-size:13.5px;margin-top:12px}
+
+/* le voci dello storico dichiarato */
+.voce-storico{display:grid;grid-template-columns:1fr 130px 150px auto;gap:12px;align-items:end}
+.voce-storico .togli{align-self:center;color:var(--gri-3);padding:10px;border-radius:var(--r-1)}
+.voce-storico .togli:hover{color:var(--male);background:rgba(255,107,88,.09)}
+.voce-storico + .voce-storico{margin-top:-6px}
+@media (max-width:700px){
+  .voce-storico{grid-template-columns:1fr;gap:12px;position:relative;
+    padding-top:6px;border-top:1px solid var(--bo)}
+  .voce-storico .togli{position:absolute;top:8px;right:0;justify-self:end}
+}
+
+.conta-car{font-size:12px;color:var(--gri-3);text-align:right;margin-top:6px}
+</style>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M48 13 A43 43 0 0 0 48 99 Z' fill='%23FFB020'/%3E%3Cpath d='M52 1 A43 43 0 0 1 52 87 Z' fill='%233AE7CD'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<div class="colonne" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<div class="entra">
+  <header class="entra-alto">
+    <div class="wrap riga tra">
+      <a class="riga" href="index.html" style="gap:9px;min-height:44px;padding:0 4px" aria-label="Leucoteo, torna al sito">
+        <span class="mon on" id="marchio" style="width:19px"></span>
+        <span class="marchio-w">leuc<span class="o" aria-hidden="true"></span>te<span aria-hidden="true">o</span></span>
+      </a>
+      <div class="avanza" id="avanza" aria-label="Avanzamento della registrazione"></div>
+    </div>
+  </header>
+
+  <main class="entra-corpo">
+    <div class="wrap entra-foglio" id="foglio"></div>
+  </main>
+</div>
+
+<div class="avviso" id="avviso" role="status" aria-live="polite"></div>
+
+<script type="module">
+import { MONETA_SVG, osserva, num } from './assets/moto.js';
+import { ICO, ILLO } from './assets/segni.js';
+import { LISTINO, FORMATI } from './assets/dati.js';
+
+document.getElementById('marchio').innerHTML = MONETA_SVG;
+
+/* ============================================================
+   LO STATO
+   Un solo oggetto: ogni passo scrive qui e nessun passo
+   ricalcola quello che ha scritto un altro.
+   ============================================================ */
+const S = {
+  lato: null, passo: 0, bloccato: false,
+
+  /* comune */
+  email: '', password: '', termini: false,
+
+  /* creator */
+  ig: null,                 // { handle, follower, er } una volta collegato
+  legale: { nome: '', cognome: '', nascita: '', cf: '', residenza: '' },
+  pubblico: { nome: '', maniglia: '', nicchia: '', bio: '', citta: '' },
+  categorie: [],
+  prezzoDa: '',
+  partitaIva: null,         // true | false — si chiede, non si presume
+  iban: '', intestatario: '',
+  haStorico: null,          // true | false
+  storico: [],              // voci dichiarate, non verificabili
+  inCerca: true,
+
+  /* azienda */
+  impresa: { ragione: '', piva: '', sede: '', nome: '' },
+  sito: '', comeVerifica: 'dns',
+  settore: '', prodotti: '',
+  cerca: [], budget: '', posti: 2,
+  referente: { nome: '', cognome: '', ruolo: '' }
+};
+
+const el = id => document.getElementById(id);
+const PASSI_TOT = 6;
+
+function avviso(t) {
+  const a = el('avviso'); a.textContent = t; a.classList.add('qui');
+  clearTimeout(a._t); a._t = setTimeout(() => a.classList.remove('qui'), 2600);
+}
+
+/* --- l'avanzamento: sei tacche che si accendono --- */
+function disegnaAvanzamento() {
+  const a = el('avanza');
+  if (S.passo === 0 || S.bloccato) { a.innerHTML = ''; document.body.dataset.lato = S.lato || 'creator'; return; }
+  const finito = S.passo > PASSI_TOT;
+  a.innerHTML =
+    Array.from({ length: PASSI_TOT }, (_, i) => i + 1).map(n =>
+      `<span class="tacca ${finito || n <= S.passo ? 'viva' : ''}"></span>`).join('') +
+    `<span class="qta">${finito ? 'fatto' : `passo ${S.passo} di ${PASSI_TOT}`}</span>`;
+  document.body.dataset.lato = S.lato || 'creator';
+}
+
+/* --- pezzi riusati --- */
+const indietro = () => `<button class="btn p ghost rise" data-torna style="margin-bottom:24px">${ICO.indietro()} Indietro</button>`;
+
+const campo = (id, etichetta, valore, o = {}) => `
+  <div class="campo-g">
+    <label class="etichetta" for="${id}">${etichetta}</label>
+    ${o.lungo
+      ? `<textarea class="campo" id="${id}" placeholder="${o.segna || ''}">${valore || ''}</textarea>`
+      : `<input class="campo" id="${id}" type="${o.tipo || 'text'}" value="${valore || ''}"
+           placeholder="${o.segna || ''}" ${o.auto ? `autocomplete="${o.auto}"` : ''}
+           ${o.modo ? `inputmode="${o.modo}"` : ''}>`}
+    ${o.aiuto ? `<span class="aiuto">${o.aiuto}</span>` : ''}
+  </div>`;
+
+const beta = () => `<span class="fascia-beta rise">${ICO.fatto()}
+  <span><b>Leucoteo è in beta:</b> gratis per tutti, zero commissioni su tutto.</span></span>`;
+
+/* ============================================================
+   PASSO 0 · scegli la tua metà
+   ============================================================ */
+const SCELTA = () => `
+  ${beta()}
+  <h1 class="rise">da che parte stai?</h1>
+  <p class="occhiello rise">Ogni collaborazione ha due metà. Scegli la tua:
+    da qui in poi Leucoteo ti mostra solo quello che serve a te.</p>
+
+  <div class="scelte">
+    <button class="scelta rise" data-lato="creator" data-scegli="creator">
+      ${ILLO.creator()}
+      <div class="testo">
+        <h2>faccio contenuti</h2>
+        <p>Sei tu che giri, scrivi, fotografi. Vuoi essere pagato senza rincorrere nessuno.</p>
+        <ul class="vantaggi">
+          <li>${ICO.fatto()}<span>Sai sempre chi ti deve pagare, quanto e da quando</span></li>
+          <li>${ICO.fatto()}<span>Uno storico verificato che nessuno può contestarti</span></li>
+          <li>${ICO.fatto()}<span>Gratis, e per i creator lo resterà sempre</span></li>
+        </ul>
+      </div>
+      <span class="btn prendi">Entro come creator</span>
+    </button>
+
+    <button class="scelta rise" data-lato="azienda" data-scegli="azienda">
+      ${ILLO.azienda()}
+      <div class="testo">
+        <h2>vendo un prodotto</h2>
+        <p>Hai un sito e un prodotto. Vuoi creator veri, con una storia che puoi controllare.</p>
+        <ul class="vantaggi">
+          <li>${ICO.fatto()}<span>Creator con storico verificato, non solo follower</span></li>
+          <li>${ICO.fatto()}<span>Accordo, consegne e diritti d’uso scritti una volta sola</span></li>
+          <li>${ICO.fatto()}<span>Paghi solo dopo aver visto il lavoro</span></li>
+        </ul>
+      </div>
+      <span class="btn due prendi">Entro come azienda</span>
+    </button>
+  </div>
+
+  <p class="gri xs rise" style="margin-top:28px;max-width:560px">
+    Per entrare come creator servono almeno ${num(LISTINO.minFollower)} follower su Instagram,
+    e il profilo va collegato: è l’unico modo per sapere che il numero è vero.</p>`;
+
+/* ============================================================
+   PASSO 1 · l'account — comune ai due lati
+   ============================================================ */
+const P1 = () => {
+  const creator = S.lato === 'creator';
+  return `
+  ${indietro()}
+  <h1 class="rise">crea l’account</h1>
+  <p class="occhiello rise">${creator
+    ? 'Serve a farti tornare dentro, e a riceverre le proposte. Nient’altro: non scriviamo a nessun altro e non vendiamo niente.'
+    : 'Usa l’indirizzo del dominio aziendale: è uno dei tre modi con cui verifichiamo che l’azienda sia davvero tua.'}</p>
+
+  <form class="modulo rise" id="modulo">
+    <div class="campi">
+      ${campo('fEmail', 'Email', S.email, { tipo: 'email', auto: 'email',
+        segna: creator ? 'giulia.ferrante@gmail.com' : 'marta.bini@nutriva.it',
+        aiuto: creator ? 'Ti mandiamo qui le proposte che ricevi. Nessuna pubblicità.'
+                       : 'Un indirizzo @tuodominio vale come mezza verifica. Con gmail o simili chiederemo il DNS.' })}
+      ${campo('fPass', 'Password', S.password, { tipo: 'password', auto: 'new-password',
+        aiuto: 'Almeno 8 caratteri.' })}
+    </div>
+    <button class="btn ${creator ? '' : 'due'}" type="submit" style="align-self:flex-start;margin-top:22px">
+      Avanti ${ICO.avanti()}</button>
+  </form>
+
+  <p class="gri xs rise" style="margin-top:20px;max-width:520px">
+    Ti manderemo un link per confermare l’indirizzo. Finché non lo apri, il profilo resta
+    invisibile agli altri.</p>`;
+};
+
+/* ============================================================
+   CREATOR · PASSO 2 — il cancello
+   Il collegamento a Instagram non è facoltativo: è la porta.
+   Il requisito dei 10.000 non esiste se il numero si può
+   scrivere a mano.
+   ============================================================ */
+const C2 = () => {
+  const min = LISTINO.minFollower;
+  if (!S.ig) return `
+    ${indietro()}
+    <h1 class="rise">collega Instagram</h1>
+    <p class="occhiello rise">Si comincia da Instagram, ed è obbligatorio: leggiamo i tuoi numeri
+      dalla fonte invece di crederti sulla parola. Gli altri canali arriveranno.</p>
+
+    <div class="collega rise">
+      <button class="canale" data-collega="ig">
+        <span class="bollo spenta">${ICO.link()}</span>
+        <span><span class="n">Instagram</span><span class="d">Leggiamo pubblico, copertura e interazione</span></span>
+        <span class="esito"><span class="pil">collega</span></span>
+      </button>
+    </div>
+
+    <div class="riservatezza rise" style="margin-top:24px">
+      <span class="bollo" style="background:rgba(var(--bra-rgb),.12);color:var(--bra-hi)">${ICO.scudo()}</span>
+      <span><b>Leggiamo solo le statistiche del profilo.</b> Non pubblichiamo niente, non scriviamo
+        a nessuno, non tocchiamo i messaggi. Il collegamento si revoca quando vuoi.</span>
+    </div>
+
+    <p class="gri xs rise" style="margin-top:22px">Per entrare servono almeno
+      ${num(min)} follower su Instagram.
+      <button class="btn p ghost" data-collega="ig-piccolo"
+        style="margin-left:8px;font-size:12px">simula un profilo sotto i ${num(min)}</button></p>`;
+
+  const passa = S.ig.follower >= min;
+  return `
+    ${indietro()}
+    <h1 class="rise">${passa ? 'ci siamo' : 'non ci siamo'}</h1>
+    <p class="occhiello rise">Numeri letti da Instagram su <b>${S.ig.handle}</b>, adesso.</p>
+
+    <div class="cancello rise">
+      <div class="q ${passa ? 'ok' : 'no'}">${num(S.ig.follower)}</div>
+      <div class="k">follower · servono almeno ${num(min)}</div>
+    </div>
+
+    ${passa ? `
+      <div class="campi rise" style="margin-top:24px">
+        <div class="scheda">
+          <div class="tabulato">
+            <div class="tab-r"><span class="k">Interazione</span><span class="g"></span><span class="n">${S.ig.er}%</span></div>
+            <div class="tab-r"><span class="k">Copertura</span><span class="g"></span>
+              <span class="n">letta da Instagram</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="riga rise" style="margin-top:24px;gap:10px">
+        <button class="btn" data-avanti>Avanti ${ICO.avanti()}</button>
+      </div>`
+    : `<div class="riga rise" style="margin-top:24px">
+        <button class="btn" data-blocca>Continua</button>
+      </div>`}`;
+};
+
+/* ============================================================
+   CREATOR · la porta chiusa
+   Se il requisito è un requisito, va detto in faccia e senza
+   giri. Non è una schermata d'errore: è una risposta.
+   ============================================================ */
+const BLOCCO = () => `
+  <div class="fine-reg rise" style="text-align:center">
+    <span class="bollo" style="width:64px;height:64px;margin:0 auto 24px;
+      background:rgba(var(--bra-rgb),.12);color:var(--bra-hi)">${ICO.scartato()}</span>
+    <h1>non possiamo accettarti, per ora</h1>
+    <p class="occhiello" style="margin:16px auto 0">
+      Su Leucoteo entrano i creator con almeno <b>${num(LISTINO.minFollower)} follower su Instagram</b>.
+      Il tuo profilo ne ha ${num(S.ig ? S.ig.follower : 0)}.</p>
+    <p class="gri sm" style="margin:20px auto 0;max-width:520px">
+      Non è un giudizio sul tuo lavoro. È che le aziende qui dentro cercano una dimensione
+      minima, e farti entrare adesso vorrebbe dire farti aspettare proposte che non arriverebbero.
+      Quando arrivi a ${num(LISTINO.minFollower)}, ricollega il profilo ed entri senza rifare niente.</p>
+    <div class="riga" style="justify-content:center;margin-top:30px;gap:10px">
+      <a class="btn ghost" href="index.html">Torna al sito</a>
+    </div>
+  </div>`;
+
+/* ============================================================
+   CREATOR · PASSO 3 — chi sei davvero
+   ============================================================ */
+const C3 = () => `
+  ${indietro()}
+  <h1 class="rise">chi sei davvero</h1>
+  <p class="occhiello rise">Un accordo lo firma una persona, non un profilo. Questi dati non
+    sono mai pubblici: li vede solo l’azienda con cui firmi, e solo quando firmate.</p>
+
+  <form class="modulo rise" id="modulo">
+    <div class="campi due-col">
+      ${campo('lNome', 'Nome', S.legale.nome, { auto: 'given-name', segna: 'Giulia' })}
+      ${campo('lCognome', 'Cognome', S.legale.cognome, { auto: 'family-name', segna: 'Ferrante' })}
+    </div>
+    <div class="campi due-col">
+      ${campo('lNascita', 'Data di nascita', S.legale.nascita, { tipo: 'date',
+        aiuto: 'Devi essere maggiorenne per firmare un accordo.' })}
+      ${campo('lCf', 'Codice fiscale', S.legale.cf, { segna: 'FRRGLI95T41A944K',
+        aiuto: 'Serve per la ricevuta. Non è mai pubblico.' })}
+    </div>
+    <div class="campi">
+      ${campo('lRes', 'Residenza', S.legale.residenza, { auto: 'street-address',
+        segna: 'Via Zamboni 12, 40126 Bologna' })}
+    </div>
+    <button class="btn" type="submit" style="align-self:flex-start;margin-top:22px">
+      Avanti ${ICO.avanti()}</button>
+  </form>`;
+
+/* ============================================================
+   CREATOR · PASSO 4 — il profilo pubblico
+   ============================================================ */
+const CATEGORIE = ['nutrizione','fitness','ricette','running','benessere','beauty','moda','casa','tech','viaggi','food','famiglia'];
+
+const C4 = () => `
+  ${indietro()}
+  <h1 class="rise">il tuo profilo</h1>
+  <p class="occhiello rise">Questo lo vedono le aziende. È l’unica pagina su cui decidono
+    se scriverti o no.</p>
+
+  <form class="modulo rise" id="modulo">
+    <div class="campi due-col">
+      ${campo('pNome', 'Nome pubblico', S.pubblico.nome || `${S.legale.nome} ${S.legale.cognome}`.trim(),
+        { aiuto: 'Può essere diverso dal nome legale.' })}
+      ${campo('pCitta', 'Città', S.pubblico.citta, { segna: 'Bologna' })}
+    </div>
+
+    <div class="campo-g" style="margin-top:20px">
+      <label class="etichetta" for="pManiglia">Il tuo indirizzo pubblico</label>
+      <div class="doppio">
+        <span class="fisso">leucoteo.it/g/</span>
+        <input class="campo" id="pManiglia" placeholder="giulia-fit" value="${S.pubblico.maniglia}">
+      </div>
+      <span class="aiuto">È il link che manderai alle aziende. Si può cambiare dopo.</span>
+    </div>
+
+    <div class="campi">
+      ${campo('pNicchia', 'Di cosa parli', S.pubblico.nicchia,
+        { segna: 'Nutrizione sportiva · fitness femminile' })}
+      ${campo('pBio', 'Presentazione', S.pubblico.bio, { lungo: true,
+        segna: 'Due righe. Le aziende leggono questa e i numeri, non altro.',
+        aiuto: 'Scrivi cosa fai e chi ti segue, non aggettivi.' })}
+    </div>
+
+    <div class="campo-g" style="margin-top:20px">
+      <span class="etichetta">Categorie</span>
+      <div class="riga" style="gap:8px;flex-wrap:wrap;margin-top:10px">
+        ${CATEGORIE.map(c => `<button type="button" class="chip" data-cat="${c}"
+          aria-pressed="${S.categorie.includes(c)}">${c}</button>`).join('')}
+      </div>
+      <span class="aiuto">Scegline da una a tre. È così che le aziende ti trovano — senza, non compari.</span>
+    </div>
+
+    <div class="campi due-col">
+      ${campo('pPrezzo', 'A partire da', S.prezzoDa, { modo: 'numeric', segna: '450',
+        aiuto: 'In euro. Un profilo senza prezzo riceve meno proposte: è indicativo, non vincolante.' })}
+    </div>
+
+    <button class="btn" type="submit" style="align-self:flex-start;margin-top:22px">
+      Avanti ${ICO.avanti()}</button>
+  </form>`;
+
+/* ============================================================
+   CREATOR · PASSO 5 — fisco e incassi
+   Si chiede adesso perché è l'unica cosa che può bloccare un
+   pagamento già maturato, e scoprirlo allora è tardi.
+   ============================================================ */
+const C5 = () => `
+  ${indietro()}
+  <h1 class="rise">come vieni pagato</h1>
+  <p class="occhiello rise">Dentro Leucoteo non passa denaro: l’azienda ti fa un bonifico normale.
+    Queste due risposte decidono quale documento prepariamo e dove finiscono i soldi.</p>
+
+  <div class="blocco rise">
+    <h3>hai la partita IVA?</h3>
+    <p class="sotto">Determina il documento che generiamo a ogni pagamento.</p>
+    <div class="opzioni-riga" style="margin-top:20px">
+      <button class="opz" data-piva="0" aria-pressed="${S.partitaIva === false}">
+        <span class="segno"></span><span><span class="t">No, non ce l’ho</span>
+        <span class="d">Prepariamo una ricevuta per prestazione occasionale, con ritenuta d’acconto
+          al 20% e marca da bollo sopra 77,47 €.</span></span></button>
+      <button class="opz" data-piva="1" aria-pressed="${S.partitaIva === true}">
+        <span class="segno"></span><span><span class="t">Sì, ce l’ho</span>
+        <span class="d">Prepariamo una fattura, senza ritenuta.</span></span></button>
+    </div>
+  </div>
+
+  <div class="blocco rise">
+    <h3>dove ti pagano</h3>
+    <p class="sotto">Un IBAN sbagliato è la causa numero uno dei ritardi. Lo vede solo l’azienda
+      della collaborazione, e solo dopo che ha approvato il lavoro.</p>
+    <form class="modulo" id="modulo" style="margin-top:20px">
+      <div class="campi">
+        ${campo('bInt', 'Intestatario del conto', S.intestatario || `${S.legale.nome} ${S.legale.cognome}`.trim(),
+          { aiuto: 'Deve coincidere con chi firma l’accordo.' })}
+        ${campo('bIban', 'IBAN', S.iban, { segna: 'IT60 X054 2811 1010 0000 0123 456' })}
+      </div>
+      <div class="riga" style="gap:10px;margin-top:22px">
+        <button class="btn" type="submit">Avanti ${ICO.avanti()}</button>
+        <button class="btn ghost p" type="button" data-avanti>Lo metto dopo</button>
+      </div>
+    </form>
+  </div>`;
+
+/* ============================================================
+   CREATOR · PASSO 6 — lo storico che hai già
+   Un profilo nuovo con lo storico vuoto non riceve proposte, e
+   senza proposte non costruisce storico. Si rompe il punto morto
+   lasciando dichiarare il pregresso — marcato per sempre come
+   non verificato, che è precisamente ciò che rende prezioso
+   quello verificato.
+   ============================================================ */
+const C6 = () => `
+  ${indietro()}
+  <h1 class="rise">hai già lavorato con dei marchi?</h1>
+  <p class="occhiello rise">Se sì, scrivilo: un profilo con qualcosa dentro riceve molte più
+    proposte di uno vuoto. Non chiediamo cifre e non chiediamo prove.</p>
+
+  <div class="opzioni-riga rise" style="margin-top:26px">
+    <button class="opz" data-storico="1" aria-pressed="${S.haStorico === true}">
+      <span class="segno"></span><span><span class="t">Sì, ne aggiungo qualcuna</span>
+      <span class="d">Compaiono sul profilo marcate <b>non verificate</b>, perché non siamo
+        stati noi a vederle succedere.</span></span></button>
+    <button class="opz" data-storico="0" aria-pressed="${S.haStorico === false}">
+      <span class="segno"></span><span><span class="t">No, comincio adesso</span>
+      <span class="d">Va benissimo. Lo storico verificato lo costruisci dalla prima
+        collaborazione chiusa qui.</span></span></button>
+  </div>
+
+  ${S.haStorico ? `
+  <div class="blocco rise" style="margin-top:22px">
+    <h3>collaborazioni dichiarate</h3>
+    <p class="sotto">Nome del marchio, quando, e cosa hai fatto. Se hai il link al contenuto, meglio.</p>
+    <div class="campi" style="margin-top:20px">
+      ${S.storico.map((v, i) => `
+      <div class="voce-storico">
+        ${campo('sA' + i, 'Marchio', v.azienda, { segna: 'FitBox Italia' })}
+        ${campo('sQ' + i, 'Quando', v.quando, { segna: 'feb 2026' })}
+        ${campo('sF' + i, 'Cosa hai fatto', v.formati, { segna: '2 reel' })}
+        <button class="togli" type="button" data-togli="${i}" aria-label="Togli">${ICO.scartato()}</button>
+      </div>`).join('')}
+    </div>
+    <button class="btn p ghost" type="button" data-aggiungi style="margin-top:18px">
+      ${ICO.piu()} Aggiungi una collaborazione</button>
+
+    <div class="riservatezza" style="margin-top:22px">
+      <span class="bollo" style="background:rgba(var(--bra-rgb),.12);color:var(--bra-hi)">${ICO.scudo()}</span>
+      <span><b>Restano non verificate per sempre.</b> Non diventano verificate col tempo e non
+        contano nei tuoi numeri. Le aziende le vedono come quello che sono: la tua parola.
+        Solo le collaborazioni chiuse dentro Leucoteo diventano storico verificato.</span>
+    </div>
+  </div>` : ''}
+
+  ${S.haStorico !== null ? `
+  <div class="blocco rise">
+    <h3>ultima cosa</h3>
+    <div class="opzioni-riga" style="margin-top:18px">
+      <button class="opz" data-termini aria-pressed="${S.termini}">
+        <span class="segno"></span><span><span class="t">Accetto termini e informativa privacy</span>
+        <span class="d">Come funziona il servizio, cosa si vede del tuo storico e cosa no.
+          <a href="termini.html" target="_blank" rel="noopener"
+            style="color:var(--acc);text-decoration:underline">Leggi</a></span></span></button>
+    </div>
+    <div class="riga" style="margin-top:22px">
+      <button class="btn" data-finisci ${S.termini ? '' : 'disabled'}>
+        Entra in Leucoteo ${ICO.avanti()}</button>
+    </div>
+  </div>` : ''}`;
+
+/* ============================================================
+   AZIENDA · PASSO 2 — l'impresa
+   Togliendo Shopify sparisce la vecchia fonte di verità. La
+   nuova è l'azienda stessa: partita IVA, dominio, email.
+   ============================================================ */
+const A2 = () => `
+  ${indietro()}
+  <h1 class="rise">l’azienda</h1>
+  <p class="occhiello rise">Sono i dati che finiscono sull’accordo, e sono anche quelli che dicono
+    a un creator che dall’altra parte c’è qualcuno di reale. È il punto in cui la maggior parte
+    delle truffe si ferma da sola.</p>
+
+  <form class="modulo rise" id="modulo">
+    <div class="campi">
+      ${campo('iRagione', 'Ragione sociale', S.impresa.ragione, { auto: 'organization',
+        segna: 'Nutriva S.r.l.', aiuto: 'Il nome completo, come sulla visura.' })}
+    </div>
+    <div class="campi due-col">
+      ${campo('iPiva', 'Partita IVA', S.impresa.piva, { segna: 'IT03847210376',
+        aiuto: 'La controlliamo sul VIES. Senza, il profilo non è verificato.' })}
+      ${campo('iNome', 'Nome commerciale', S.impresa.nome, { segna: 'Nutriva',
+        aiuto: 'Come ti conoscono i clienti. È questo che vedono i creator.' })}
+    </div>
+    <div class="campi">
+      ${campo('iSede', 'Sede legale', S.impresa.sede, { auto: 'street-address',
+        segna: 'Via Emilia 44, 40139 Bologna' })}
+    </div>
+    <button class="btn due" type="submit" style="align-self:flex-start;margin-top:22px">
+      Avanti ${ICO.avanti()}</button>
+  </form>`;
+
+/* ============================================================
+   AZIENDA · PASSO 3 — il sito, qualunque piattaforma
+   ============================================================ */
+const A3 = () => `
+  ${indietro()}
+  <h1 class="rise">il tuo sito</h1>
+  <p class="occhiello rise">Qualunque piattaforma: Shopify, WooCommerce, Prestashop, Magento,
+    o un sito fatto a mano. A Leucoteo non serve entrarci dentro — serve solo sapere che è tuo.</p>
+
+  <form class="modulo rise" id="modulo">
+    <div class="campo-g">
+      <label class="etichetta" for="aSito">Indirizzo del sito</label>
+      <div class="doppio">
+        <span class="fisso">https://</span>
+        <input class="campo" id="aSito" placeholder="nutriva.it" value="${S.sito}">
+      </div>
+      <span class="aiuto">Il dominio, non la pagina di un prodotto.</span>
+    </div>
+
+    <div class="campo-g" style="margin-top:24px">
+      <span class="etichetta">Come vuoi dimostrare che è tuo</span>
+      <div class="opzioni-riga" style="margin-top:12px">
+        <button class="opz" type="button" data-verifica="dns" aria-pressed="${S.comeVerifica === 'dns'}">
+          <span class="segno"></span><span><span class="t">Un record DNS</span>
+          <span class="d">Ti diamo una stringa da aggiungere ai DNS del dominio. Il modo più solido.</span></span></button>
+        <button class="opz" type="button" data-verifica="meta" aria-pressed="${S.comeVerifica === 'meta'}">
+          <span class="segno"></span><span><span class="t">Un meta tag nella home</span>
+          <span class="d">Si incolla una riga nell’intestazione del sito. Funziona su ogni piattaforma.</span></span></button>
+        <button class="opz" type="button" data-verifica="email" aria-pressed="${S.comeVerifica === 'email'}">
+          <span class="segno"></span><span><span class="t">L’email del dominio</span>
+          <span class="d">Ti scriviamo a un indirizzo @${S.sito || 'tuodominio'} e tu apri il link.</span></span></button>
+      </div>
+    </div>
+
+    <div class="riservatezza" style="margin-top:24px">
+      <span class="bollo" style="background:rgba(var(--bra-rgb),.12);color:var(--bra-hi)">${ICO.scudo()}</span>
+      <span><b>Non chiediamo nessun accesso al tuo negozio.</b> Non leggiamo ordini, non vediamo
+        clienti, non installiamo niente. L’unica cosa che Leucoteo misura sono i clic sui link
+        che creerai tu per i creator — e li conta il nostro redirect, non il tuo sito.</span>
+    </div>
+
+    <div class="riga" style="gap:10px;margin-top:24px">
+      <button class="btn due" type="submit">Avanti ${ICO.avanti()}</button>
+      <button class="btn ghost p" type="button" data-avanti>Verifico dopo</button>
+    </div>
+  </form>
+
+  <p class="gri xs rise" style="margin-top:16px">Senza verifica il profilo funziona, ma resta
+    senza spunta — e i creator vedono che manca.</p>`;
+
+/* ============================================================
+   AZIENDA · PASSO 4 — cosa vendi
+   ============================================================ */
+const A4 = () => `
+  ${indietro()}
+  <h1 class="rise">cosa vendi</h1>
+  <p class="occhiello rise">Serve a farti trovare dai creator giusti. Un profilo generico
+    riceve proposte generiche.</p>
+
+  <form class="modulo rise" id="modulo">
+    <div class="campi">
+      ${campo('aSettore', 'Settore', S.settore, { segna: 'Integratori e nutrizione sportiva' })}
+      ${campo('aProdotti', 'I prodotti', S.prodotti, { lungo: true,
+        segna: 'proteine, barrette, pre-workout',
+        aiuto: 'In poche parole, come li direbbe un cliente.' })}
+    </div>
+    <button class="btn due" type="submit" style="align-self:flex-start;margin-top:22px">
+      Avanti ${ICO.avanti()}</button>
+  </form>`;
+
+/* ============================================================
+   AZIENDA · PASSO 5 — cosa cerchi
+   Il numero di posti e la scadenza non sono decorazione: sono
+   ciò che tiene vera la bacheca e riporta dentro i creator.
+   ============================================================ */
+const A5 = () => `
+  ${indietro()}
+  <h1 class="rise">cosa cerchi</h1>
+  <p class="occhiello rise">Quello che scrivi qui diventa il tuo annuncio: è la riga che un
+    creator legge prima di decidere se proporsi.</p>
+
+  <form class="modulo rise" id="modulo">
+    <div class="campo-g">
+      <span class="etichetta">Formati che ti interessano</span>
+      <div class="riga" style="gap:8px;flex-wrap:wrap;margin-top:10px">
+        ${FORMATI.map(f => `<button type="button" class="chip" data-formato="${f.k}"
+          aria-pressed="${S.cerca.includes(f.k)}">${f.t}</button>`).join('')}
+      </div>
+    </div>
+
+    <div class="campi due-col">
+      ${campo('aBudget', 'Budget per collaborazione', S.budget, { segna: '300-800 €',
+        aiuto: 'Una forbice onesta. È il primo filtro che usa un creator, e scriverla larga fa perdere tempo a tutti.' })}
+      ${campo('aPosti', 'Quanti creator cerchi', S.posti, { modo: 'numeric', segna: '3',
+        aiuto: 'Quando i posti finiscono, l’annuncio si chiude da solo.' })}
+    </div>
+
+    <div class="nota due" style="margin-top:24px">
+      <b>L’annuncio scade dopo 30 giorni.</b> Ti chiediamo di confermarlo, e se non rispondi
+      sparisce. È scomodo, ed è voluto: una bacheca piena di annunci morti smette di valere
+      qualcosa per tutti — anche per te.
+    </div>
+
+    <button class="btn due" type="submit" style="align-self:flex-start;margin-top:24px">
+      Avanti ${ICO.avanti()}</button>
+  </form>`;
+
+/* ============================================================
+   AZIENDA · PASSO 6 — chi firma
+   ============================================================ */
+const A6 = () => `
+  ${indietro()}
+  <h1 class="rise">chi firma</h1>
+  <p class="occhiello rise">La persona che accetta le proposte e firma gli accordi per l’azienda.
+    Compare sull’accordo, non nelle ricerche.</p>
+
+  <form class="modulo rise" id="modulo">
+    <div class="campi due-col">
+      ${campo('rNome', 'Nome', S.referente.nome, { auto: 'given-name', segna: 'Marta' })}
+      ${campo('rCognome', 'Cognome', S.referente.cognome, { auto: 'family-name', segna: 'Bini' })}
+    </div>
+    <div class="campi">
+      ${campo('rRuolo', 'Ruolo', S.referente.ruolo, { segna: 'Marketing' })}
+    </div>
+
+    <div class="opzioni-riga" style="margin-top:26px">
+      <button class="opz" type="button" data-termini aria-pressed="${S.termini}">
+        <span class="segno"></span><span><span class="t">Accetto termini e informativa privacy</span>
+        <span class="d">Come funziona il servizio, e cosa si vede dei creator con cui lavori.
+          <a href="termini.html" target="_blank" rel="noopener"
+            style="color:var(--acc);text-decoration:underline">Leggi</a></span></span></button>
+    </div>
+
+    <div class="riga" style="margin-top:24px">
+      <button class="btn due" data-finisci ${S.termini ? '' : 'disabled'} type="button">
+        Entra in Leucoteo ${ICO.avanti()}</button>
+    </div>
+  </form>`;
+
+/* ============================================================
+   FATTO
+   ============================================================ */
+const FATTO = () => `
+  <div class="fine-reg rise">
+    <video class="filmato-reg" src="assets/video/come-funziona.mp4"
+           poster="assets/video/come-funziona-poster.png" autoplay muted loop playsinline
+           aria-label="Animazione: si firma, si consegna, si paga, si conferma"></video>
+    <h1>ci sei</h1>
+    <p class="occhiello" style="margin:14px auto 0">${S.lato === 'creator'
+      ? 'Sei in cerca di collaborazioni: le aziende ti vedono in cima ai risultati. Il primo passo che conta è proporti tu — chi si propone chiude tre volte più collaborazioni di chi aspetta.'
+      : 'Il tuo annuncio è online e i creator lo vedono. Apri «Creator» e proponi la prima collaborazione: le proposte che partono dall’azienda hanno la risposta più alta.'}</p>
+    <div class="riga" style="justify-content:center;margin-top:30px;gap:10px">
+      <a class="btn ${S.lato === 'azienda' ? 'due' : ''}" href="app.html?lato=${S.lato}">Apri Leucoteo</a>
+      ${S.lato === 'creator' ? '<a class="btn ghost" href="mediakit.html">Guarda il tuo profilo pubblico</a>' : ''}
+    </div>
+  </div>`;
+
+/* ============================================================
+   DISEGNO
+   ============================================================ */
+const VISTE = {
+  creator: { 1: P1, 2: C2, 3: C3, 4: C4, 5: C5, 6: C6, 7: FATTO },
+  azienda: { 1: P1, 2: A2, 3: A3, 4: A4, 5: A5, 6: A6, 7: FATTO }
+};
+
+function disegna() {
+  disegnaAvanzamento();
+  const html = S.bloccato ? BLOCCO()
+    : S.passo === 0 ? SCELTA()
+    : VISTE[S.lato][S.passo]();
+  el('foglio').innerHTML = html;
+  scrollTo({ top: 0, behavior: 'instant' });
+  osserva(el('foglio'));
+
+  const m = el('modulo');
+  if (m) m.addEventListener('submit', invia);
+}
+
+/* --- ogni passo raccoglie i suoi campi e basta --- */
+function invia(e) {
+  e.preventDefault();
+  const v = id => (el(id)?.value || '').trim();
+
+  if (S.passo === 1) {
+    S.email = v('fEmail'); S.password = v('fPass');
+    if (!S.email || !S.email.includes('@')) return avviso('Serve un indirizzo email valido');
+    if (S.password.length < 8) return avviso('La password deve avere almeno 8 caratteri');
+  }
+
+  if (S.lato === 'creator') {
+    if (S.passo === 3) {
+      S.legale = { nome: v('lNome'), cognome: v('lCognome'), nascita: v('lNascita'),
+                   cf: v('lCf'), residenza: v('lRes') };
+      if (!S.legale.nome || !S.legale.cognome) return avviso('Servono nome e cognome reali');
+      if (!S.legale.nascita) return avviso('Serve la data di nascita');
+      if (!maggiorenne(S.legale.nascita)) return avviso('Devi essere maggiorenne per firmare un accordo');
+      if (!S.legale.cf) return avviso('Serve il codice fiscale per la ricevuta');
+    }
+    if (S.passo === 4) {
+      S.pubblico = { nome: v('pNome'), maniglia: v('pManiglia'), nicchia: v('pNicchia'),
+                     bio: v('pBio'), citta: v('pCitta') };
+      S.prezzoDa = v('pPrezzo');
+      if (!S.pubblico.nome) return avviso('Serve un nome pubblico');
+      if (!S.pubblico.maniglia) return avviso('Serve il tuo indirizzo pubblico');
+      if (!S.categorie.length) return avviso('Scegli almeno una categoria, o non ti troverà nessuno');
+    }
+    if (S.passo === 5) {
+      S.intestatario = v('bInt'); S.iban = v('bIban');
+      if (S.partitaIva === null) return avviso('Dicci se hai la partita IVA');
+    }
+  } else {
+    if (S.passo === 2) {
+      S.impresa = { ragione: v('iRagione'), piva: v('iPiva'), sede: v('iSede'), nome: v('iNome') };
+      if (!S.impresa.ragione) return avviso('Serve la ragione sociale');
+      if (!S.impresa.piva) return avviso('Serve la partita IVA: è quello che ti rende verificabile');
+      if (!S.impresa.nome) S.impresa.nome = S.impresa.ragione;
+    }
+    if (S.passo === 3) {
+      S.sito = v('aSito');
+      if (!S.sito) return avviso('Serve l’indirizzo del sito');
+    }
+    if (S.passo === 4) {
+      S.settore = v('aSettore'); S.prodotti = v('aProdotti');
+      if (!S.settore) return avviso('Serve il settore');
+    }
+    if (S.passo === 5) {
+      S.budget = v('aBudget'); S.posti = v('aPosti') || 1;
+      if (!S.cerca.length) return avviso('Scegli almeno un formato');
+      if (!S.budget) return avviso('Serve una forbice di budget');
+    }
+  }
+
+  S.passo++; disegna();
+}
+
+function maggiorenne(iso) {
+  if (!iso) return false;
+  const n = new Date(iso), o = new Date();
+  let a = o.getFullYear() - n.getFullYear();
+  const m = o.getMonth() - n.getMonth();
+  if (m < 0 || (m === 0 && o.getDate() < n.getDate())) a--;
+  return a >= 18;
+}
+
+/* --- le voci dello storico dichiarato si leggono prima di
+   ridisegnare, altrimenti sparisce quello che si è scritto --- */
+function leggiStorico() {
+  S.storico = S.storico.map((_, i) => ({
+    azienda: el('sA' + i)?.value.trim() || '',
+    quando:  el('sQ' + i)?.value.trim() || '',
+    formati: el('sF' + i)?.value.trim() || ''
+  }));
+}
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-scegli],[data-torna],[data-collega],[data-avanti],[data-blocca],'
+    + '[data-piva],[data-storico],[data-aggiungi],[data-togli],[data-termini],[data-finisci],'
+    + '[data-cat],[data-formato],[data-verifica]');
+  if (!b) return;
+
+  /* --- scelta del lato --- */
+  if (b.dataset.scegli) { S.lato = b.dataset.scegli; S.passo = 1; return disegna(); }
+
+  if (b.dataset.torna !== undefined) {
+    if (S.passo <= 1) { S.passo = 0; S.lato = null; }
+    else S.passo--;
+    return disegna();
+  }
+
+  /* --- il cancello --- */
+  if (b.dataset.collega) {
+    const k = b.dataset.collega;
+    if (k === 'ig') S.ig = { handle: '@giulia.fit', follower: 38400, er: 4.8 };
+    if (k === 'ig-piccolo') S.ig = { handle: '@giulia.fit', follower: 4120, er: 6.9 };
+    avviso('Instagram collegato');
+    return disegna();
+  }
+  if (b.dataset.blocca !== undefined) { S.bloccato = true; return disegna(); }
+  if (b.dataset.avanti !== undefined) { S.passo++; return disegna(); }
+
+  /* --- scelte a pulsante --- */
+  if (b.dataset.piva !== undefined) { S.partitaIva = b.dataset.piva === '1'; return disegna(); }
+  if (b.dataset.verifica) { S.comeVerifica = b.dataset.verifica; return disegna(); }
+  if (b.dataset.termini !== undefined) { S.termini = !S.termini; return disegna(); }
+
+  if (b.dataset.cat) {
+    const c = b.dataset.cat;
+    if (S.categorie.includes(c)) S.categorie = S.categorie.filter(x => x !== c);
+    else if (S.categorie.length >= 3) return avviso('Massimo tre categorie');
+    else S.categorie.push(c);
+    b.setAttribute('aria-pressed', S.categorie.includes(c));
+    return;
+  }
+  if (b.dataset.formato) {
+    const f = b.dataset.formato;
+    S.cerca = S.cerca.includes(f) ? S.cerca.filter(x => x !== f) : S.cerca.concat(f);
+    b.setAttribute('aria-pressed', S.cerca.includes(f));
+    return;
+  }
+
+  /* --- lo storico dichiarato --- */
+  if (b.dataset.storico !== undefined) {
+    S.haStorico = b.dataset.storico === '1';
+    if (S.haStorico && !S.storico.length) S.storico = [{ azienda: '', quando: '', formati: '' }];
+    return disegna();
+  }
+  if (b.dataset.aggiungi !== undefined) {
+    leggiStorico(); S.storico.push({ azienda: '', quando: '', formati: '' }); return disegna();
+  }
+  if (b.dataset.togli !== undefined) {
+    leggiStorico(); S.storico.splice(+b.dataset.togli, 1); return disegna();
+  }
+
+  /* --- fine --- */
+  if (b.dataset.finisci !== undefined) {
+    if (!S.termini) return avviso('Devi accettare i termini per entrare');
+    if (S.lato === 'creator' && S.haStorico) leggiStorico();
+    if (S.lato === 'azienda') {
+      S.referente = { nome: el('rNome')?.value.trim() || '', cognome: el('rCognome')?.value.trim() || '',
+                      ruolo: el('rRuolo')?.value.trim() || '' };
+    }
+    S.passo = 7; return disegna();
+  }
+});
+
+disegna();
+</script>
+</body>
+</html>
