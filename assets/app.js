@@ -7,13 +7,13 @@
    usando le coordinate che trova qui, e le due parti dichiarano
    pagamento e incasso. La moneta si allinea sull'incasso.
    ============================================================ */
-import { moneta, gestoMoneta, osserva, MONETA_SVG, eur, eur2, num, mille } from './moto.js';
-import { ICO, ILLO } from './segni.js';
+import { moneta, gestoMoneta, osserva, MONETA_SVG, eur, eur2, num, mille } from './moto.js?v=20260902-1132';
+import { ICO, ILLO } from './segni.js?v=20260902-1132';
 import {
   LISTINO, conto, PASSI, FORMULE, FORMATI, DIRITTI,
   ANTEPRIME, CREATOR, AZIENDA, COLLAB, LINK, STORICO, STORICO_ESTERNO,
   TROVA, AZIENDE_APERTE, PAGAMENTI
-} from './dati.js';
+} from './dati.js?v=20260902-1132';
 
 /* ------------------------------------------------------------
    STATO — riflesso nell'indirizzo
