@@ -56,6 +56,8 @@ body[data-fianco="chiuso"] .tela{grid-template-columns:var(--fianco-min) 1fr}
 .marchio .coda{display:inline-block;max-width:6em;overflow:hidden;vertical-align:bottom;
   transition:max-width .38s var(--e-std),opacity .22s var(--e-std)}
 body[data-fianco="chiuso"] .marchio .coda{max-width:0;opacity:0}
+/* a fianco chiuso resta solo il segno: la targhetta se ne va con la parola */
+body[data-fianco="chiuso"] .beta{display:none}
 body[data-fianco="chiuso"] .fianco .marchio{margin:0 auto}
 body[data-fianco="chiuso"] .fianco .marchio .marchio-w{font-size:22px}
 
@@ -776,6 +778,7 @@ body[data-fianco="chiuso"] .marchio .coda{transition-delay:0s}
       <a class="marchio" href="index.html" aria-label="Leucoteo, torna al sito">
         <span class="marchio-w"><span class="coda cap">leuc</span><span class="o" aria-hidden="true"></span><span class="coda">te<span aria-hidden="true">o</span></span></span>
       </a>
+      <button type="button" class="beta coda" aria-label="Leucoteo è in versione beta">beta<span class="spiega" role="tooltip"><b>La versione beta è la prima versione di Leucoteo.</b> È <span class="gratis">gratuita</span> per creator e aziende, senza commissioni e senza carta di credito.</span></button>
       <button class="piega tap" id="piega" aria-label="Riduci il menu" aria-expanded="true">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
              stroke-linejoin="round" aria-hidden="true">
