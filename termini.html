@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800&family=Poppins:wght@600&display=swap">
-<link rel="stylesheet" href="assets/stile.css?v=20260902-1132">
+<link rel="stylesheet" href="assets/stile.css?v=20260902-1555">
 <script>document.documentElement.classList.add('con-script');</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M48 13 A43 43 0 0 0 48 99 Z' fill='%23FFB020'/%3E%3Cpath d='M52 1 A43 43 0 0 1 52 87 Z' fill='%233AE7CD'/%3E%3C/svg%3E">
 <style>
@@ -51,8 +51,8 @@
 <main style="padding:56px 0" id="testo"></main>
 
 <script type="module">
-import { MONETA_SVG } from './assets/moto.js?v=20260902-1132';
-import { ICO } from './assets/segni.js?v=20260902-1132';
+import { MONETA_SVG } from './assets/moto.js?v=20260902-1555';
+import { ICO } from './assets/segni.js?v=20260902-1555';
 document.getElementById('marchio').innerHTML = MONETA_SVG;
 
 const si = t => `<li class="si">${ICO.fatto()}<span>${t}</span></li>`;
@@ -117,9 +117,12 @@ document.getElementById('testo').innerHTML = `
   <p>Dentro Leucoteo non passa denaro. L'azienda paga con un bonifico ordinario, e per farlo ha
     bisogno dell'IBAN del creator: viene mostrato solo dopo che il lavoro è stato approvato,
     solo all'azienda di quella collaborazione, e non compare mai in nessuna ricerca o scheda pubblica.</p>
-  <p>Un IBAN e un codice fiscale sono dati personali comuni: si possono trattare per eseguire
-    un contratto di cui l'interessato è parte. Vanno però conservati cifrati, mostrati solo a chi
-    deve pagare e cancellati quando il rapporto finisce.</p>
+  <p>Un IBAN è un dato personale comune: si può trattare per eseguire un contratto di cui
+    l'interessato è parte. Va però conservato cifrato, mostrato solo a chi deve pagare e
+    cancellato quando il rapporto finisce.</p>
+  <p>Leucoteo non chiede il codice fiscale e non calcola imposte: niente ritenuta d'acconto,
+    niente marca da bollo, nessuna trattenuta. Il documento fiscale e il regime con cui il
+    compenso viene dichiarato restano una faccenda fra azienda e creator.</p>
 
   <h2>quello che leucoteo non promette</h2>
   <p>L'accettazione dei termini con data, ora, indirizzo IP e conferma via codice è una firma

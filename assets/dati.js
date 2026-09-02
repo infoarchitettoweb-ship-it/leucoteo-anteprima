@@ -32,23 +32,21 @@ export const LISTINO = {
   beta: true,
   servizio: 0,      // commissione di servizio all'azienda
   commissione: 0,   // percentuale trattenuta da Leucoteo: nessuna, su niente
-  ritenuta: 0.20,   // ritenuta d'acconto, prestazione occasionale
-  bollo: 2.00,      // marca da bollo oltre 77,47 €
   minFollower: 10000,   // il cancello d'ingresso, su Instagram
   scadenzaRicerca: 30,  // giorni dopo cui lo stato «in cerca» chiede conferma
   finestraClic: 90      // giorni per cui un link affiliato resta monitorato
 };
 
 /* Il conto di una collaborazione, dai due lati.
-   È l'unica funzione che tocca i soldi: se cambia il modello,
-   cambia qui e cambia ovunque. Non c'è più nessuna quota sul
-   venduto — né per il creator né per Leucoteo. */
+   È l'unica funzione che tocca i soldi, ed è volutamente banale:
+   la cifra concordata è la cifra, punto. Leucoteo non calcola
+   ritenute, bolli o imposte — il regime fiscale è una faccenda
+   fra il creator, l'azienda e i loro commercialisti, e sbagliarla
+   al posto loro sarebbe un danno, non un servizio. Nessuna quota
+   sul venduto: né per il creator né per Leucoteo. */
 export function conto(c) {
   const lordo = c.cachet;
-  const bollo = lordo > 77.47 && !c.partitaIva ? LISTINO.bollo : 0;
-  const ritenuta = c.partitaIva ? 0 : lordo * LISTINO.ritenuta;
-  const netto = lordo - ritenuta - bollo;
-  return { lordo, ritenuta, bollo, netto, patto: 0, costoAzienda: lordo };
+  return { lordo, patto: 0, costoAzienda: lordo };
 }
 
 /* --- i sei stati di una collaborazione ---------------------
@@ -119,15 +117,15 @@ export const CREATOR = {
   bio: 'Preparo ricette proteiche vere, con ingredienti che si trovano al supermercato. Il mio pubblico compra: scontrino medio 53 €, resi sotto il 6%.',
   categorie: ['nutrizione', 'fitness', 'ricette'],
 
-  /* --- identità legale: chi firma davvero. Non è mai pubblica. --- */
+  /* --- identità legale: chi firma davvero. Non è mai pubblica.
+     Il minimo per firmare un accordo ed essere una persona vera:
+     niente codice fiscale, niente residenza. Se un giorno servono
+     per un documento, si chiedono in quel momento e a chi serve. --- */
   legale: {
     nome: 'Giulia', cognome: 'Ferrante',
-    codiceFiscale: 'FRRGLI95T41A944K',
     nascita: '1 dicembre 1995',
-    residenza: 'Via Zamboni 12, 40126 Bologna',
     email: 'giulia.ferrante@gmail.com', emailVerificata: true
   },
-  partitaIva: false,               // chiesto in registrazione, cambiabile in impostazioni
 
   /* --- numeri letti, non dichiarati.
      Solo Instagram: si comincia da lì, e un canale che non leggiamo
@@ -187,7 +185,7 @@ export const COLLAB = [
     id: 'C-104', origine: 'azienda', azienda: 'Nutriva', aziendaIni: 'NU',
     creator: 'Giulia Ferrante', handle: '@giulia.fit', creatorIni: 'GF',
     titolo: 'Lancio proteine vegetali',
-    formula: 'prodotto', cachet: 600, partitaIva: false,
+    formula: 'prodotto', cachet: 600,
     passo: 2, scadenzaConsegna: '27 ago', scadenzaPubblicazione: '30 ago',
     firmata: '12 ago · 18:42', pagata: null, incassata: null,
     diritti: 'adv-90', esclusiva: '30 giorni sulla categoria integratori proteici',
@@ -204,7 +202,7 @@ export const COLLAB = [
     id: 'C-109', origine: 'azienda', azienda: 'Nutriva', aziendaIni: 'NU',
     creator: 'Giulia Ferrante', handle: '@giulia.fit', creatorIni: 'GF',
     titolo: 'Barrette proteiche',
-    formula: 'fisso', cachet: 380, partitaIva: false,
+    formula: 'fisso', cachet: 380,
     passo: 3, scadenzaConsegna: '21 ago', scadenzaPubblicazione: '24 ago',
     firmata: '6 ago · 10:22', pagata: null, incassata: null,
     diritti: 'organico', esclusiva: 'nessuna',
@@ -220,7 +218,7 @@ export const COLLAB = [
     id: 'C-107', origine: 'azienda', azienda: 'Caffè Mora', aziendaIni: 'CM',
     creator: 'Giulia Ferrante', handle: '@giulia.fit', creatorIni: 'GF',
     titolo: 'Pre-workout al caffè',
-    formula: 'fisso', cachet: 400, partitaIva: false,
+    formula: 'fisso', cachet: 400,
     passo: 0, scadenzaConsegna: 'da concordare', scadenzaPubblicazione: 'da concordare',
     firmata: null, pagata: null, incassata: null,
     diritti: 'organico', esclusiva: 'nessuna',
@@ -238,7 +236,7 @@ export const COLLAB = [
     id: 'C-112', origine: 'creator', azienda: 'Verde Vivo', aziendaIni: 'VV',
     creator: 'Giulia Ferrante', handle: '@giulia.fit', creatorIni: 'GF',
     titolo: 'Vitamine, routine del mattino',
-    formula: 'fisso', cachet: 320, partitaIva: false,
+    formula: 'fisso', cachet: 320,
     passo: 0, scadenzaConsegna: 'da concordare', scadenzaPubblicazione: 'da concordare',
     firmata: null, pagata: null, incassata: null,
     diritti: 'organico', esclusiva: 'nessuna',
@@ -254,7 +252,7 @@ export const COLLAB = [
     id: 'C-113', origine: 'azienda', azienda: 'Nutriva', aziendaIni: 'NU',
     creator: 'Sara Ferro', handle: '@sara.runs', creatorIni: 'SF',
     titolo: 'Barrette, prova su strada',
-    formula: 'prodotto', cachet: 260, partitaIva: false,
+    formula: 'prodotto', cachet: 260,
     passo: 0, scadenzaConsegna: 'da concordare', scadenzaPubblicazione: 'da concordare',
     firmata: null, pagata: null, incassata: null,
     diritti: 'organico', esclusiva: 'nessuna',
@@ -268,7 +266,7 @@ export const COLLAB = [
     id: 'C-101', origine: 'creator', azienda: 'Pura Skin', aziendaIni: 'PS',
     creator: 'Giulia Ferrante', handle: '@giulia.fit', creatorIni: 'GF',
     titolo: 'Routine post-workout',
-    formula: 'prodotto', cachet: 350, partitaIva: false,
+    formula: 'prodotto', cachet: 350,
     passo: 6, scadenzaConsegna: 'chiusa il 2 ago', scadenzaPubblicazione: '—',
     firmata: '21 lug · 11:05', pagata: '2 ago · 09:10', incassata: '4 ago · 08:30',
     diritti: 'organico', esclusiva: 'nessuna',
@@ -282,7 +280,7 @@ export const COLLAB = [
     id: 'C-098', origine: 'azienda', azienda: 'Zampa&Co', aziendaIni: 'ZC',
     creator: 'Giulia Ferrante', handle: '@giulia.fit', creatorIni: 'GF',
     titolo: 'Snack proteici cane',
-    formula: 'fisso', cachet: 200, partitaIva: false,
+    formula: 'fisso', cachet: 200,
     passo: 6, scadenzaConsegna: 'chiusa il 12 lug', scadenzaPubblicazione: '—',
     firmata: '5 lug · 09:12', pagata: '12 lug · 14:00', incassata: '15 lug · 10:05',
     diritti: 'nessuno', esclusiva: 'nessuna',
@@ -298,7 +296,7 @@ export const COLLAB = [
     id: 'C-095', origine: 'azienda', azienda: 'Nutriva', aziendaIni: 'NU',
     creator: 'Sara Ferro', handle: '@sara.runs', creatorIni: 'SF',
     titolo: 'Proteine, prima della corsa',
-    formula: 'fisso', cachet: 260, partitaIva: false,
+    formula: 'fisso', cachet: 260,
     passo: 6, scadenzaConsegna: 'chiusa il 28 lug', scadenzaPubblicazione: '—',
     firmata: '14 lug · 09:40', pagata: '28 lug · 11:20', incassata: '30 lug · 08:15',
     diritti: 'organico', esclusiva: 'nessuna',
@@ -312,7 +310,7 @@ export const COLLAB = [
     id: 'C-090', origine: 'azienda', azienda: 'Nutriva', aziendaIni: 'NU',
     creator: 'Elisa Conti', handle: '@elisa.wellness', creatorIni: 'EC',
     titolo: 'Vitamine, storie informative',
-    formula: 'prodotto', cachet: 300, partitaIva: false,
+    formula: 'prodotto', cachet: 300,
     passo: 6, scadenzaConsegna: 'chiusa il 14 lug', scadenzaPubblicazione: '—',
     firmata: '1 lug · 15:05', pagata: '14 lug · 10:00', incassata: '16 lug · 09:30',
     diritti: 'nessuno', esclusiva: 'nessuna',

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800&family=Poppins:wght@600&display=swap">
-<link rel="stylesheet" href="assets/stile.css?v=20260902-1132">
+<link rel="stylesheet" href="assets/stile.css?v=20260902-1555">
 <script>document.documentElement.classList.add('con-script');</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M48 13 A43 43 0 0 0 48 99 Z' fill='%23FFB020'/%3E%3Cpath d='M52 1 A43 43 0 0 1 52 87 Z' fill='%233AE7CD'/%3E%3C/svg%3E">
 <style>
@@ -138,10 +138,38 @@ body[data-fianco="chiuso"] .fianco #cerca{display:none}
 .gruppo-filtri{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .gruppo-filtri > .uc{flex:none}
 .barra-filtri .divisore{width:1px;height:22px;background:var(--bo-2);flex:none}
+
+/* --- la tendina: esiste solo sul telefono ---------------------
+   Stessa pastiglia dei filtri, ma con dentro un <select> vero:
+   si apre con il selettore del sistema, che su un telefono è il
+   modo più veloce e più familiare di scegliere fra otto voci. --- */
+.tendina{display:none;position:relative;flex:1;min-width:0}
+.tendina select{
+  appearance:none;-webkit-appearance:none;width:100%;
+  background:var(--velo);box-shadow:inset 0 0 0 1px var(--bo);
+  border:0;border-radius:var(--r-p);color:var(--bia);
+  font-size:14px;font-weight:600;padding:0 38px 0 15px;min-height:44px;
+  text-overflow:ellipsis;cursor:pointer}
+.tendina select:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.tendina .freccia{position:absolute;right:13px;top:50%;transform:translateY(-50%);
+  pointer-events:none;color:var(--gri-2);display:flex}
+.tendina .freccia .ico{width:17px;height:17px}
 @media (max-width:860px){
-  .barra-filtri{gap:12px}
+  /* Sul telefono la barra diventa una colonna di menù a tendina: le file
+     di pastiglie da far scorrere con il dito erano ingombranti e non si
+     vedevano mai per intero. Una tendina per riga, a tutta larghezza,
+     perché mezza riga taglierebbe le voci lunghe («chi risponde di più»).
+     Gli interruttori (verificati, in cerca…) restano pastiglie: sono sì/no,
+     e una tendina a due voci sarebbe un giro inutile. */
+  .barra-filtri{display:flex;flex-direction:column;align-items:stretch;
+    gap:13px;margin-bottom:18px}
   .barra-filtri .divisore{display:none}
-  .gruppo-filtri{width:100%}
+  .gruppo-filtri{min-width:0;flex-direction:column;align-items:stretch;gap:7px}
+  .gruppo-filtri > .uc{align-self:flex-start;font-size:11px}
+  .tendina{display:block}
+  .gruppo-filtri .filtri:not(.interruttori){display:none}
+  .filtri.interruttori{flex-wrap:wrap;overflow:visible;margin:0;padding:0}
+  .filtri.interruttori .filtro{flex:0 1 auto}
 }
 
 .menu{display:flex;flex-direction:column;gap:2px;margin-top:2px;position:relative}
@@ -280,6 +308,10 @@ body[data-fianco="chiuso"] .chi .testo{max-width:0;opacity:0}
 .griglia-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
 .griglia-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
 .tremezzo{display:grid;grid-template-columns:1.35fr .65fr;gap:20px;align-items:start}
+/* una colonna di griglia non scende sotto il contenuto più largo se non
+   glielo si dice: senza questo, una riga lunga dentro una scheda allarga
+   la colonna e la pagina esce di lato */
+.tremezzo > *{min-width:0}
 .sez-t{display:flex;align-items:baseline;gap:13px;margin:46px 0 18px}
 .sez-t h2{font-weight:600;font-size:19px;letter-spacing:var(--tr-l);text-transform:lowercase}
 .sez-t .l{flex:1;height:1px;background:var(--bo)}
@@ -751,11 +783,20 @@ body[data-fianco="chiuso"] .marchio .coda{transition-delay:0s}
   .avviso{bottom:calc(var(--pollice) + 12px)}
   .trovato{padding:20px}
 
+  /* i filtri scorrono in orizzontale: è l'unico scroll laterale ammesso,
+     ed è deliberato. Sul telefono però sono pillole, non pulsanti: più
+     basse, più strette e più leggere, così se ne vedono tre invece di una
+     e mezza. */
   .filtri{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;
     -webkit-overflow-scrolling:touch;scrollbar-width:none;
-    margin:0 -18px;padding:2px 18px 6px}
+    gap:7px;margin:0 -18px;padding:2px 18px 6px}
   .filtri::-webkit-scrollbar{display:none}
-  .filtro{flex:none;scroll-snap-align:start}
+  .filtro{flex:none;scroll-snap-align:start;
+    font-size:13px;padding:8px 13px;min-height:36px}
+  /* l'area toccabile resta piena anche se la pillola è più bassa */
+  .filtro::after{content:"";position:absolute;left:0;right:0;top:50%;
+    height:44px;transform:translateY(-50%)}
+  .filtro{position:relative}
 }
 
 /* --- schermi molto stretti --- */
@@ -826,6 +867,6 @@ body[data-fianco="chiuso"] .marchio .coda{transition-delay:0s}
 
 <div class="avviso" id="avviso" role="status" aria-live="polite"></div>
 
-<script type="module" src="assets/app.js?v=20260902-1132"></script>
+<script type="module" src="assets/app.js?v=20260902-1555"></script>
 </body>
 </html>

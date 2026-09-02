@@ -7,13 +7,13 @@
    usando le coordinate che trova qui, e le due parti dichiarano
    pagamento e incasso. La moneta si allinea sull'incasso.
    ============================================================ */
-import { moneta, gestoMoneta, osserva, MONETA_SVG, eur, eur2, num, mille } from './moto.js?v=20260902-1132';
-import { ICO, ILLO } from './segni.js?v=20260902-1132';
+import { moneta, gestoMoneta, osserva, MONETA_SVG, eur, eur2, num, mille } from './moto.js?v=20260902-1555';
+import { ICO, ILLO } from './segni.js?v=20260902-1555';
 import {
   LISTINO, conto, PASSI, FORMULE, FORMATI, DIRITTI,
   ANTEPRIME, CREATOR, AZIENDA, COLLAB, LINK, STORICO, STORICO_ESTERNO,
   TROVA, AZIENDE_APERTE, PAGAMENTI
-} from './dati.js?v=20260902-1132';
+} from './dati.js?v=20260902-1555';
 
 /* ------------------------------------------------------------
    STATO — riflesso nell'indirizzo
@@ -160,6 +160,34 @@ function ava(tipo, misura = '', foto = null) {
 const altroLato = () => S.lato === 'creator' ? 'azienda' : 'creator';
 const pil = (t, c = '') => `<span class="pil ${c}">${t}</span>`;
 const titoloSez = (t, extra = '') => `<div class="sez-t"><h2>${t}</h2><span class="l"></span>${extra}</div>`;
+
+/* --- un gruppo di filtri a scelta singola ---------------------
+   Sul desktop è una fila di pastiglie: si vedono tutte le scelte
+   insieme e ne basta una per cambiare. Su un telefono la stessa
+   fila diventa una striscia da far scorrere con il dito — tante
+   pastiglie enormi buttate lì, e nessuna che si vede per intera.
+   Quindi sotto gli 860 px lo stesso gruppo si presenta come un
+   menù a tendina: una riga sola, il valore scelto sempre in
+   chiaro. Le pastiglie restano nel documento e restano la fonte
+   della verità: la tendina si limita a premerle.
+   `voci` è una lista di { k, t }. --------------------------- */
+const gruppoFiltri = (etichetta, attributo, voci, attivo) => {
+  const scelta = voci.find(v => v.k === attivo) || voci[0];
+  return `
+  <div class="gruppo-filtri">
+    <span class="uc gri">${etichetta}</span>
+    <div class="filtri">
+      ${voci.map(v => `<button class="filtro" data-${attributo}="${v.k}"
+        aria-pressed="${v.k === attivo}">${v.t}</button>`).join('')}
+    </div>
+    <div class="tendina">
+      <select data-tendina="${attributo}" aria-label="${etichetta}">
+        ${voci.map(v => `<option value="${v.k}"${v.k === scelta.k ? ' selected' : ''}>${v.t}</option>`).join('')}
+      </select>
+      <span class="freccia" aria-hidden="true">${ICO.giu ? ICO.giu() : '&#9662;'}</span>
+    </div>
+  </div>`;
+};
 
 const stelle = (voto, quanti = null) => voto ? `<span class="stelle">${
   [1,2,3,4,5].map(n => {
@@ -511,26 +539,15 @@ V.creator.aziende = () => {
   </div>
 
   <div class="barra-filtri rise">
-    <div class="gruppo-filtri">
-      <span class="uc gri">nicchia</span>
-      <div class="filtri">
-        <button class="filtro" data-cat-azienda="tutte" aria-pressed="${S.catAzienda === 'tutte'}">tutte</button>
-        ${categorie.map(c =>
-          `<button class="filtro" data-cat-azienda="${c}" aria-pressed="${S.catAzienda === c}">${c}</button>`).join('')}
-      </div>
-    </div>
+    ${gruppoFiltri('nicchia', 'cat-azienda',
+      [{ k: 'tutte', t: 'tutte' }].concat(categorie.map(c => ({ k: c, t: c }))), S.catAzienda)}
     <span class="divisore" aria-hidden="true"></span>
-    <div class="gruppo-filtri">
-      <span class="uc gri">ordina per</span>
-      <div class="filtri">
-        ${Object.keys(etichette).map(k =>
-          `<button class="filtro" data-ordina-azienda="${k}" aria-pressed="${S.ordinaAzienda === k}">${etichette[k]}</button>`).join('')}
-      </div>
-    </div>
+    ${gruppoFiltri('ordina per', 'ordina-azienda',
+      Object.keys(etichette).map(k => ({ k, t: etichette[k] })), S.ordinaAzienda)}
     <span class="divisore" aria-hidden="true"></span>
     <div class="gruppo-filtri">
       <span class="uc gri">mostra solo</span>
-      <div class="filtri">
+      <div class="filtri interruttori">
         <button class="filtro" data-incerca-az aria-pressed="${S.soloInCercaAz}">chi cerca adesso</button>
       </div>
     </div>
@@ -756,7 +773,7 @@ V.azienda.oggi = () => {
   const miei = aperte().filter(c => turno(c).chi === 'azienda');
   const clicTot = LINK.reduce((s, l) => s + l.clic, 0);
   const clic7g = LINK.reduce((s, l) => s + l.clic7g, 0);
-  const daPagare = aperte().filter(c => c.passo === 4).reduce((s, c) => s + conto(c).netto, 0);
+  const daPagare = aperte().filter(c => c.passo === 4).reduce((s, c) => s + conto(c).lordo, 0);
   const impegnato = aperte().filter(c => c.passo >= 1).reduce((s, c) => s + conto(c).lordo, 0);
 
   const compiti = miei.map(c => {
@@ -765,8 +782,8 @@ V.azienda.oggi = () => {
       testo: 'Guarda il lavoro e approvalo. Se non fai niente, si approva da solo fra cinque giorni.',
       azione: `<button class="btn p due" data-apri="${c.id}">Guarda il lavoro</button>` });
     if (c.passo === 4) return daFare({
-      icona: ICO.banca, cod: c.id, titolo: `Paga ${eur2(conto(c).netto)} a ${c.creator.split(' ')[0]}`,
-      testo: 'Il lavoro è approvato: qui trovi IBAN, intestatario e la ricevuta già compilata.',
+      icona: ICO.banca, cod: c.id, titolo: `Paga ${eur2(conto(c).lordo)} a ${c.creator.split(' ')[0]}`,
+      testo: 'Il lavoro è approvato: qui trovi IBAN e intestatario per fare il bonifico.',
       azione: `<button class="btn p due" data-apri="${c.id}">Vai al pagamento</button>` });
     return daFare({
       icona: ICO.contratto, cod: c.id, titolo: 'Una richiesta aspetta la tua risposta',
@@ -845,17 +862,12 @@ V.azienda.creator = () => {
   </div>
 
   <div class="barra-filtri rise">
-    <div class="gruppo-filtri">
-      <span class="uc gri">ordina per</span>
-      <div class="filtri">
-        ${Object.keys(etichette).map(k =>
-          `<button class="filtro" data-ordina="${k}" aria-pressed="${S.ordina === k}">${etichette[k]}</button>`).join('')}
-      </div>
-    </div>
+    ${gruppoFiltri('ordina per', 'ordina',
+      Object.keys(etichette).map(k => ({ k, t: etichette[k] })), S.ordina)}
     <span class="divisore" aria-hidden="true"></span>
     <div class="gruppo-filtri">
       <span class="uc gri">mostra solo</span>
-      <div class="filtri">
+      <div class="filtri interruttori">
         <button class="filtro" data-verificati aria-pressed="${S.soloVerificati}">verificati</button>
         <button class="filtro" data-incerca aria-pressed="${S.soloInCerca}">in cerca</button>
       </div>
@@ -863,7 +875,9 @@ V.azienda.creator = () => {
     <span class="divisore" aria-hidden="true"></span>
     <div class="gruppo-filtri">
       <span class="uc gri">in anteprima</span>
-      <button class="filtro" data-scegli-anteprime>${ICO.impostazioni()} ${S.anteprime.map(nomeAnt).join(' · ').toLowerCase()}</button>
+      <div class="filtri interruttori">
+        <button class="filtro" data-scegli-anteprime>${ICO.impostazioni()} ${S.anteprime.map(nomeAnt).join(' · ').toLowerCase()}</button>
+      </div>
     </div>
   </div>
 
@@ -921,7 +935,7 @@ function contattiChiusi(t) {
   <div class="riservatezza rise" style="margin-top:20px">
     <span class="bollo" style="background:rgba(var(--acc-rgb),.12);color:var(--acc)">${ICO.fatto()}</span>
     <span><b>Avete un accordo firmato:</b> i contatti diretti sono visibili dentro la
-      collaborazione, insieme all’IBAN e alla ricevuta.</span>
+      collaborazione, insieme all’IBAN.</span>
   </div>`;
   return `
   <div class="riservatezza rise" style="margin-top:20px">
@@ -1169,25 +1183,6 @@ V.creator.impostazioni = () => `
       </div>
 
       <div class="blocco rise">
-        <h3>hai la partita IVA?</h3>
-        <p class="sotto">È l’unica cosa che decide quale documento prepariamo a ogni pagamento.
-          Se cambia, cambialo qui: i documenti già emessi restano come sono.</p>
-        <div class="opzioni-riga" style="margin-top:20px">
-          <button class="opz" data-piva="0" aria-pressed="${!CREATOR.partitaIva}"><span class="segno"></span>
-            <span><span class="t">No, non ce l’ho</span>
-            <span class="d">Ricevuta per prestazione occasionale, con ritenuta d’acconto al 20%
-              e marca da bollo sopra 77,47 €.</span></span></button>
-          <button class="opz" data-piva="1" aria-pressed="${CREATOR.partitaIva}"><span class="segno"></span>
-            <span><span class="t">Sì, ce l’ho</span>
-            <span class="d">Fattura, senza ritenuta.</span></span></button>
-        </div>
-        <div class="campi due-col" style="margin-top:22px">
-          ${campo('fCf', 'Codice fiscale', CREATOR.legale.codiceFiscale)}
-          ${campo('fRes', 'Residenza', CREATOR.legale.residenza)}
-        </div>
-      </div>
-
-      <div class="blocco rise">
         <h3>collaborazioni dichiarate</h3>
         <p class="sotto">Quelle che hai fatto prima di arrivare qui, o chiuse fuori da Leucoteo.
           Restano marcate come non verificate: non le abbiamo viste succedere, e fingere il
@@ -1325,7 +1320,7 @@ function vistaProposta() {
   const lista = versoCreator ? SEZIONI.richiesta : SEZIONI.candidatura;
   if (S.passoProposta >= lista.length) S.passoProposta = lista.length - 1;
   const sez = lista[S.passoProposta].k;
-  const k = conto({ cachet: +b.cachet || 0, partitaIva: CREATOR.partitaIva });
+  const k = conto({ cachet: +b.cachet || 0 });
 
   const blocchi = {
 
@@ -1342,7 +1337,7 @@ function vistaProposta() {
         <div class="campi due-col" style="margin-top:24px">
           ${['fisso','prodotto','continua'].includes(b.formula)
             ? campo('bCachet', 'Compenso in euro', b.cachet, { tipo: 'numeric', chiave: 'cachet',
-                aiuto: b.formula === 'continua' ? 'Al mese, al lordo di ritenuta e bollo.' : 'Al lordo di ritenuta e bollo.' }) : ''}
+                aiuto: b.formula === 'continua' ? 'Al mese. È la cifra che riceve il creator.' : 'È la cifra che riceve il creator.' }) : ''}
         </div>
         <div class="nota" style="margin-top:20px;font-size:13.5px">
           <b>Niente quote sul venduto.</b> Leucoteo non si collega al tuo negozio e non legge
@@ -1505,19 +1500,19 @@ function vistaProposta() {
         <div class="campi due-col" style="margin-top:24px">
           ${['fisso','prodotto','continua'].includes(b.formula)
             ? campo('bCachet', 'Quanto chiedi, in euro', b.cachet, { tipo: 'numeric', chiave: 'cachet',
-                aiuto: b.formula === 'continua' ? 'Al mese, al lordo di ritenuta e bollo.' : 'Al lordo: quello che ti arriva netto è più sotto.' }) : ''}
+                aiuto: b.formula === 'continua' ? 'Al mese. È la cifra che ti arriva.' : 'È la cifra che ti arriva: Leucoteo non trattiene niente.' }) : ''}
         </div>
 
         ${+b.cachet ? `
         <div class="scheda tagliato su2" style="margin-top:22px">
           <div class="tabulato">
             <div class="tab-r"><span class="k">Chiedi</span><span class="g"></span><span class="n">${eur2(k.lordo)}</span></div>
-            ${CREATOR.partitaIva
-              ? `<div class="tab-r"><span class="k">Con partita IVA, nessuna ritenuta</span><span class="g"></span><span class="n">—</span></div>`
-              : `<div class="tab-r"><span class="k">Ritenuta d’acconto 20%</span><span class="g"></span><span class="n giu">− ${eur2(k.ritenuta)}</span></div>
-                 ${k.bollo ? `<div class="tab-r"><span class="k">Marca da bollo</span><span class="g"></span><span class="n giu">− ${eur2(k.bollo)}</span></div>` : ''}`}
-            <div class="tab-r tot"><span class="k">Ti arrivano</span><span class="g"></span><span class="n">${eur2(k.netto)}</span></div>
+            <div class="tab-r"><span class="k">Trattenuto da Leucoteo</span><span class="g"></span><span class="n">gratis · beta</span></div>
+            <div class="tab-r tot"><span class="k">Ti arrivano</span><span class="g"></span><span class="n">${eur2(k.lordo)}</span></div>
           </div>
+          <p class="gri xs" style="margin-top:12px">Come dichiarare questa cifra dipende dal tuo
+            regime fiscale: quello lo decidi tu con il tuo commercialista, Leucoteo non calcola
+            imposte al posto tuo.</p>
         </div>` : ''}
       </div>
 
@@ -1713,12 +1708,13 @@ function vistaCollab(c) {
           <button class="btn p ghost copia" data-avviso="Causale copiata">Copia</button></div></div>
     </div>
     <div class="tabulato" style="margin-top:22px">
-      <div class="tab-r"><span class="k">Compenso lordo</span><span class="g"></span><span class="n">${eur2(k.lordo)}</span></div>
-      <div class="tab-r"><span class="k">Ritenuta d’acconto 20% (la versi tu)</span><span class="g"></span><span class="n giu">− ${eur2(k.ritenuta)}</span></div>
-      ${k.bollo ? `<div class="tab-r"><span class="k">Marca da bollo</span><span class="g"></span><span class="n giu">− ${eur2(k.bollo)}</span></div>` : ''}
-      <div class="tab-r tot"><span class="k">Da bonificare</span><span class="g"></span><span class="n">${eur2(k.netto)}</span></div>
+      <div class="tab-r"><span class="k">Compenso concordato</span><span class="g"></span><span class="n">${eur2(k.lordo)}</span></div>
+      <div class="tab-r tot"><span class="k">Da bonificare</span><span class="g"></span><span class="n">${eur2(k.lordo)}</span></div>
     </div>
-    <button class="btn p ghost pieno" style="margin-top:18px" data-avviso="Ricevuta scaricata">Scarica la ricevuta già compilata</button>
+    <p class="gri xs" style="margin-top:12px">È la cifra concordata, senza altro. Il documento
+      fiscale e le eventuali trattenute li gestite voi due come sempre: Leucoteo non calcola
+      imposte e non emette documenti al posto vostro.</p>
+    <button class="btn p ghost pieno" style="margin-top:18px" data-avviso="Riepilogo scaricato">Scarica il riepilogo dell’accordo</button>
   </div>` : ''}
 
   <div class="tremezzo" style="margin-top:26px">
@@ -1732,7 +1728,7 @@ function vistaCollab(c) {
           <div class="tab-r"><span class="k">Esclusiva</span><span class="g"></span><span class="n">${c.esclusiva}</span></div>
           <div class="tab-r"><span class="k">Consegna entro</span><span class="g"></span><span class="n">${c.scadenzaConsegna}</span></div>
           <div class="tab-r"><span class="k">Pubblicazione entro</span><span class="g"></span><span class="n">${c.scadenzaPubblicazione}</span></div>
-          ${c.codice !== '—' ? `<div class="tab-r"><span class="k">Codice sconto</span><span class="g"></span><span class="n acc">${c.codice}</span></div>` : ''}
+          ${c.codice && c.codice !== '—' ? `<div class="tab-r"><span class="k">Codice sconto</span><span class="g"></span><span class="n acc">${c.codice}</span></div>` : ''}
         </div>
         ${c.brief ? `<div class="nota" style="margin-top:20px;font-size:13.5px"><b>Brief.</b> ${c.brief}</div>` : ''}
       </div>
@@ -1796,16 +1792,12 @@ function vistaCollab(c) {
       <div class="scheda tagliato su2 rise">
         <div class="tabulato">
           <div class="tab-r"><span class="k">Compenso</span><span class="g"></span><span class="n">${eur2(c.cachet)}</span></div>
-          ${io === 'creator' ? `
-            <div class="tab-r"><span class="k">Ritenuta d'acconto 20%</span><span class="g"></span><span class="n giu">− ${eur2(k.ritenuta)}</span></div>
-            ${k.bollo ? `<div class="tab-r"><span class="k">Marca da bollo</span><span class="g"></span><span class="n giu">− ${eur2(k.bollo)}</span></div>` : ''}
-            <div class="tab-r tot"><span class="k">Netto a te</span><span class="g"></span><span class="n">${eur2(k.netto)}</span></div>`
-          : `<div class="tab-r"><span class="k">Quota Leucoteo</span>
-              <span class="g"></span><span class="n">gratis · beta</span></div>
-            <div class="tab-r tot"><span class="k">Totale a tuo carico</span><span class="g"></span><span class="n">${eur2(k.costoAzienda)}</span></div>`}
+          <div class="tab-r"><span class="k">Quota Leucoteo</span>
+            <span class="g"></span><span class="n">gratis · beta</span></div>
+          <div class="tab-r tot"><span class="k">${io === 'creator' ? 'A te' : 'Totale a tuo carico'}</span><span class="g"></span><span class="n">${eur2(k.lordo)}</span></div>
         </div>
         <p class="gri xs" style="margin-top:14px">${io === 'creator'
-          ? 'La ritenuta la trattiene e la versa l’azienda: tu ricevi il netto.'
+          ? 'È la cifra concordata: Leucoteo non trattiene niente e non calcola imposte. Come la dichiari lo decidi tu.'
           : 'Leucoteo non trattiene niente e non entra nel bonifico: paghi solo il creator.'}</p>
       </div>
 
@@ -1814,13 +1806,13 @@ function vistaCollab(c) {
       <div class="rilascio rise">
         <div style="width:110px;margin:0 auto">${moneta('on')}</div>
         <div class="eti fatto uc" style="margin-top:18px">incasso confermato</div>
-        <p class="gri sm" style="margin-top:10px">${eur2(k.netto)} ricevuti il ${c.incassata}. Le due metà combaciano.</p>
+        <p class="gri sm" style="margin-top:10px">${eur2(k.lordo)} ricevuti il ${c.incassata}. Le due metà combaciano.</p>
       </div>` : c.passo === 5 && io === 'creator' ? `
       <div class="rilascio rise">
         <div class="presa" id="presaRil" role="slider" tabindex="0"
              aria-label="Trascina verso il basso per confermare che il bonifico è arrivato"
              aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${moneta('libera')}</div>
-        <div class="eti uc" id="etiRil" style="margin-top:18px">trascina giù per confermare ${eur2(k.netto)}</div>
+        <div class="eti uc" id="etiRil" style="margin-top:18px">trascina giù per confermare ${eur2(k.lordo)}</div>
         <p class="gri sm" style="margin-top:10px">Confermalo solo quando li vedi sul conto:
           da qui in poi la collaborazione risulta chiusa e pagata.</p>
       </div>` : `
@@ -2136,7 +2128,7 @@ function attaccaGesto() {
       /* il gesto più importante del prodotto merita la sua scena:
          le due metà combaciano, il riquadro si accende un istante */
       presa.classList.add('chiuso');
-      avvisa(`Incasso confermato · ${eur2(k.netto)} da ${c.azienda}`);
+      avvisa(`Incasso confermato · ${eur2(k.lordo)} da ${c.azienda}`);
       setTimeout(() => {
         c.passo = PASSI.length; c.incassata = 'oggi · adesso';
         c.scadenzaConsegna = 'conclusa oggi';
@@ -2202,12 +2194,24 @@ function fra30Giorni() {
 /* ------------------------------------------------------------
    ASCOLTI
    ------------------------------------------------------------ */
+/* --- la tendina dei filtri: non decide niente da sola ---------
+   Cambiare la scelta nel menù equivale a premere la pastiglia
+   corrispondente, che è rimasta nel documento. Così esiste una
+   sola strada per cambiare un filtro, e mobile e desktop non
+   possono divergere. ------------------------------------------ */
+document.addEventListener('change', (e) => {
+  const sel = e.target.closest('select[data-tendina]');
+  if (!sel) return;
+  const bottone = document.querySelector(`[data-${sel.dataset.tendina}="${CSS.escape(sel.value)}"]`);
+  if (bottone) bottone.click();
+});
+
 document.addEventListener('click', (e) => {
   const b = e.target.closest(`[data-vai],[data-apri],[data-avanza],[data-avviso],[data-proponi],[data-proponi-a],
     [data-ordina],[data-verificati],[data-incerca],[data-scheda],
     [data-ordina-azienda],[data-cat-azienda],[data-incerca-az],[data-passo-proposta],[data-campo],
     [data-aggiungi-consegna],[data-togli-consegna],[data-invia-proposta],[data-annulla-proposta],
-    [data-consenso],[data-cerca],[data-piva],[data-scegli-anteprime],[data-anteprima],
+    [data-consenso],[data-cerca],[data-scegli-anteprime],[data-anteprima],
     [data-crea-link],[data-listino],[data-inviate]`.replace(/\s+/g, ''));
   if (!b) return;
 
@@ -2228,12 +2232,6 @@ document.addEventListener('click', (e) => {
   }
   if (b.dataset.incercaAz !== undefined) { S.soloInCercaAz = !S.soloInCercaAz; return disegna(); }
   if (b.dataset.consenso !== undefined) { CREATOR.consensoStorico = b.dataset.consenso === '1'; return disegna(); }
-  if (b.dataset.piva !== undefined) {
-    CREATOR.partitaIva = b.dataset.piva === '1';
-    avvisa(CREATOR.partitaIva ? 'D’ora in poi generiamo fatture' : 'D’ora in poi generiamo ricevute con ritenuta');
-    return disegna();
-  }
-
   /* --- il segnale di ricerca: si accende e si spegne ovunque compaia --- */
   if (b.dataset.cerca !== undefined) {
     const st = mioStato();

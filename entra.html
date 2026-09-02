@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800&family=Poppins:wght@600&display=swap">
-<link rel="stylesheet" href="assets/stile.css?v=20260902-1132">
+<link rel="stylesheet" href="assets/stile.css?v=20260902-1555">
 <script>document.documentElement.classList.add('con-script');</script>
 <style>
 .filmato-reg{display:block;width:100%;max-width:560px;margin:0 auto 30px;
@@ -72,9 +72,9 @@
 <div class="avviso" id="avviso" role="status" aria-live="polite"></div>
 
 <script type="module">
-import { MONETA_SVG, osserva, num } from './assets/moto.js?v=20260902-1132';
-import { ICO, ILLO } from './assets/segni.js?v=20260902-1132';
-import { LISTINO, FORMATI } from './assets/dati.js?v=20260902-1132';
+import { MONETA_SVG, osserva, num } from './assets/moto.js?v=20260902-1555';
+import { ICO, ILLO } from './assets/segni.js?v=20260902-1555';
+import { LISTINO, FORMATI } from './assets/dati.js?v=20260902-1555';
 
 document.getElementById('marchio').innerHTML = MONETA_SVG;
 
@@ -91,26 +91,24 @@ const S = {
 
   /* creator */
   ig: null,                 // { handle, follower, er } una volta collegato
-  legale: { nome: '', cognome: '', nascita: '', cf: '', residenza: '' },
-  pubblico: { nome: '', maniglia: '', nicchia: '', bio: '', citta: '' },
+  legale: { nome: '', cognome: '', nascita: '' },
+  pubblico: { nome: '', maniglia: '', nicchia: '', bio: '' },
   categorie: [],
   prezzoDa: '',
-  partitaIva: null,         // true | false — si chiede, non si presume
-  iban: '', intestatario: '',
   haStorico: null,          // true | false
   storico: [],              // voci dichiarate, non verificabili
   inCerca: true,
 
   /* azienda */
-  impresa: { ragione: '', piva: '', sede: '', nome: '' },
+  impresa: { ragione: '', piva: '', nome: '' },
   sito: '', comeVerifica: 'dns',
   settore: '', prodotti: '',
   cerca: [], budget: '', posti: 2,
-  referente: { nome: '', cognome: '', ruolo: '' }
+  referente: { nome: '', cognome: '' }
 };
 
 const el = id => document.getElementById(id);
-const PASSI_TOT = 6;
+const PASSI_TOT = 5;
 
 function avviso(t) {
   const a = el('avviso'); a.textContent = t; a.classList.add('qui');
@@ -309,27 +307,26 @@ const BLOCCO = () => `
 const C3 = () => `
   ${indietro()}
   <h1 class="rise">chi sei davvero</h1>
-  <p class="occhiello rise">Un accordo lo firma una persona, non un profilo. Questi dati non
-    sono mai pubblici: li vede solo l’azienda con cui firmi, e solo quando firmate.</p>
+  <p class="occhiello rise">Un accordo lo firma una persona, non un profilo. Tre campi, e sono
+    gli ultimi che ti chiediamo di privato: non sono mai pubblici e li vede solo l’azienda con
+    cui firmi, quando firmate.</p>
 
   <form class="modulo rise" id="modulo">
     <div class="campi due-col">
       ${campo('lNome', 'Nome', S.legale.nome, { auto: 'given-name', segna: 'Giulia' })}
       ${campo('lCognome', 'Cognome', S.legale.cognome, { auto: 'family-name', segna: 'Ferrante' })}
     </div>
-    <div class="campi due-col">
-      ${campo('lNascita', 'Data di nascita', S.legale.nascita, { tipo: 'date',
-        aiuto: 'Devi essere maggiorenne per firmare un accordo.' })}
-      ${campo('lCf', 'Codice fiscale', S.legale.cf, { segna: 'FRRGLI95T41A944K',
-        aiuto: 'Serve per la ricevuta. Non è mai pubblico.' })}
-    </div>
     <div class="campi">
-      ${campo('lRes', 'Residenza', S.legale.residenza, { auto: 'street-address',
-        segna: 'Via Zamboni 12, 40126 Bologna' })}
+      ${campo('lNascita', 'Data di nascita', S.legale.nascita, { tipo: 'date',
+        aiuto: 'Serve solo a verificare che tu sia maggiorenne: un minorenne non può firmare.' })}
     </div>
     <button class="btn" type="submit" style="align-self:flex-start;margin-top:22px">
       Avanti ${ICO.avanti()}</button>
-  </form>`;
+  </form>
+
+  <p class="gri xs rise" style="margin-top:20px;max-width:520px">
+    Niente codice fiscale, niente residenza, niente documenti: Leucoteo non emette fatture e non
+    calcola imposte al posto tuo, quindi quei dati non ci servono.</p>`;
 
 /* ============================================================
    CREATOR · PASSO 4 — il profilo pubblico
@@ -343,10 +340,9 @@ const C4 = () => `
     se scriverti o no.</p>
 
   <form class="modulo rise" id="modulo">
-    <div class="campi due-col">
+    <div class="campi">
       ${campo('pNome', 'Nome pubblico', S.pubblico.nome || `${S.legale.nome} ${S.legale.cognome}`.trim(),
         { aiuto: 'Può essere diverso dal nome legale.' })}
-      ${campo('pCitta', 'Città', S.pubblico.citta, { segna: 'Bologna' })}
     </div>
 
     <div class="campo-g" style="margin-top:20px">
@@ -361,9 +357,9 @@ const C4 = () => `
     <div class="campi">
       ${campo('pNicchia', 'Di cosa parli', S.pubblico.nicchia,
         { segna: 'Nutrizione sportiva · fitness femminile' })}
-      ${campo('pBio', 'Presentazione', S.pubblico.bio, { lungo: true,
+      ${campo('pBio', 'Presentazione (facoltativa)', S.pubblico.bio, { lungo: true,
         segna: 'Due righe. Le aziende leggono questa e i numeri, non altro.',
-        aiuto: 'Scrivi cosa fai e chi ti segue, non aggettivi.' })}
+        aiuto: 'Puoi scriverla dopo, dal profilo. Chi la scrive riceve più proposte.' })}
     </div>
 
     <div class="campo-g" style="margin-top:20px">
@@ -376,8 +372,8 @@ const C4 = () => `
     </div>
 
     <div class="campi due-col">
-      ${campo('pPrezzo', 'A partire da', S.prezzoDa, { modo: 'numeric', segna: '450',
-        aiuto: 'In euro. Un profilo senza prezzo riceve meno proposte: è indicativo, non vincolante.' })}
+      ${campo('pPrezzo', 'A partire da (facoltativo)', S.prezzoDa, { modo: 'numeric', segna: '450',
+        aiuto: 'In euro. Indicativo, non vincolante — ma un profilo con un prezzo riceve più proposte.' })}
     </div>
 
     <button class="btn" type="submit" style="align-self:flex-start;margin-top:22px">
@@ -385,49 +381,7 @@ const C4 = () => `
   </form>`;
 
 /* ============================================================
-   CREATOR · PASSO 5 — fisco e incassi
-   Si chiede adesso perché è l'unica cosa che può bloccare un
-   pagamento già maturato, e scoprirlo allora è tardi.
-   ============================================================ */
-const C5 = () => `
-  ${indietro()}
-  <h1 class="rise">come vieni pagato</h1>
-  <p class="occhiello rise">Dentro Leucoteo non passa denaro: l’azienda ti fa un bonifico normale.
-    Queste due risposte decidono quale documento prepariamo e dove finiscono i soldi.</p>
-
-  <div class="blocco rise">
-    <h3>hai la partita IVA?</h3>
-    <p class="sotto">Determina il documento che generiamo a ogni pagamento.</p>
-    <div class="opzioni-riga" style="margin-top:20px">
-      <button class="opz" data-piva="0" aria-pressed="${S.partitaIva === false}">
-        <span class="segno"></span><span><span class="t">No, non ce l’ho</span>
-        <span class="d">Prepariamo una ricevuta per prestazione occasionale, con ritenuta d’acconto
-          al 20% e marca da bollo sopra 77,47 €.</span></span></button>
-      <button class="opz" data-piva="1" aria-pressed="${S.partitaIva === true}">
-        <span class="segno"></span><span><span class="t">Sì, ce l’ho</span>
-        <span class="d">Prepariamo una fattura, senza ritenuta.</span></span></button>
-    </div>
-  </div>
-
-  <div class="blocco rise">
-    <h3>dove ti pagano</h3>
-    <p class="sotto">Un IBAN sbagliato è la causa numero uno dei ritardi. Lo vede solo l’azienda
-      della collaborazione, e solo dopo che ha approvato il lavoro.</p>
-    <form class="modulo" id="modulo" style="margin-top:20px">
-      <div class="campi">
-        ${campo('bInt', 'Intestatario del conto', S.intestatario || `${S.legale.nome} ${S.legale.cognome}`.trim(),
-          { aiuto: 'Deve coincidere con chi firma l’accordo.' })}
-        ${campo('bIban', 'IBAN', S.iban, { segna: 'IT60 X054 2811 1010 0000 0123 456' })}
-      </div>
-      <div class="riga" style="gap:10px;margin-top:22px">
-        <button class="btn" type="submit">Avanti ${ICO.avanti()}</button>
-        <button class="btn ghost p" type="button" data-avanti>Lo metto dopo</button>
-      </div>
-    </form>
-  </div>`;
-
-/* ============================================================
-   CREATOR · PASSO 6 — lo storico che hai già
+   CREATOR · PASSO 5 — lo storico che hai già
    Un profilo nuovo con lo storico vuoto non riceve proposte, e
    senza proposte non costruisce storico. Si rompe il punto morto
    lasciando dichiarare il pregresso — marcato per sempre come
@@ -510,13 +464,9 @@ const A2 = () => `
     </div>
     <div class="campi due-col">
       ${campo('iPiva', 'Partita IVA', S.impresa.piva, { segna: 'IT03847210376',
-        aiuto: 'La controlliamo sul VIES. Senza, il profilo non è verificato.' })}
+        aiuto: 'La controlliamo sul VIES: da lì leggiamo anche la sede, così non te la chiediamo.' })}
       ${campo('iNome', 'Nome commerciale', S.impresa.nome, { segna: 'Nutriva',
         aiuto: 'Come ti conoscono i clienti. È questo che vedono i creator.' })}
-    </div>
-    <div class="campi">
-      ${campo('iSede', 'Sede legale', S.impresa.sede, { auto: 'street-address',
-        segna: 'Via Emilia 44, 40139 Bologna' })}
     </div>
     <button class="btn due" type="submit" style="align-self:flex-start;margin-top:22px">
       Avanti ${ICO.avanti()}</button>
@@ -573,13 +523,17 @@ const A3 = () => `
     senza spunta — e i creator vedono che manca.</p>`;
 
 /* ============================================================
-   AZIENDA · PASSO 4 — cosa vendi
+   AZIENDA · PASSO 4 — cosa vendi e cosa cerchi
+   Erano due schermate: le domande sono poche e vicine di senso,
+   e una schermata in meno è un'azienda in più che arriva in fondo.
+   Il numero di posti e la scadenza non sono decorazione: sono
+   ciò che tiene vera la bacheca e riporta dentro i creator.
    ============================================================ */
 const A4 = () => `
   ${indietro()}
-  <h1 class="rise">cosa vendi</h1>
-  <p class="occhiello rise">Serve a farti trovare dai creator giusti. Un profilo generico
-    riceve proposte generiche.</p>
+  <h1 class="rise">cosa vendi, cosa cerchi</h1>
+  <p class="occhiello rise">Quello che scrivi qui diventa il tuo annuncio: è quello che un
+    creator legge prima di decidere se proporsi.</p>
 
   <form class="modulo rise" id="modulo">
     <div class="campi">
@@ -588,23 +542,8 @@ const A4 = () => `
         segna: 'proteine, barrette, pre-workout',
         aiuto: 'In poche parole, come li direbbe un cliente.' })}
     </div>
-    <button class="btn due" type="submit" style="align-self:flex-start;margin-top:22px">
-      Avanti ${ICO.avanti()}</button>
-  </form>`;
 
-/* ============================================================
-   AZIENDA · PASSO 5 — cosa cerchi
-   Il numero di posti e la scadenza non sono decorazione: sono
-   ciò che tiene vera la bacheca e riporta dentro i creator.
-   ============================================================ */
-const A5 = () => `
-  ${indietro()}
-  <h1 class="rise">cosa cerchi</h1>
-  <p class="occhiello rise">Quello che scrivi qui diventa il tuo annuncio: è la riga che un
-    creator legge prima di decidere se proporsi.</p>
-
-  <form class="modulo rise" id="modulo">
-    <div class="campo-g">
+    <div class="campo-g" style="margin-top:24px">
       <span class="etichetta">Formati che ti interessano</span>
       <div class="riga" style="gap:8px;flex-wrap:wrap;margin-top:10px">
         ${FORMATI.map(f => `<button type="button" class="chip" data-formato="${f.k}"
@@ -630,9 +569,9 @@ const A5 = () => `
   </form>`;
 
 /* ============================================================
-   AZIENDA · PASSO 6 — chi firma
+   AZIENDA · PASSO 5 — chi firma
    ============================================================ */
-const A6 = () => `
+const A5 = () => `
   ${indietro()}
   <h1 class="rise">chi firma</h1>
   <p class="occhiello rise">La persona che accetta le proposte e firma gli accordi per l’azienda.
@@ -642,9 +581,6 @@ const A6 = () => `
     <div class="campi due-col">
       ${campo('rNome', 'Nome', S.referente.nome, { auto: 'given-name', segna: 'Marta' })}
       ${campo('rCognome', 'Cognome', S.referente.cognome, { auto: 'family-name', segna: 'Bini' })}
-    </div>
-    <div class="campi">
-      ${campo('rRuolo', 'Ruolo', S.referente.ruolo, { segna: 'Marketing' })}
     </div>
 
     <div class="opzioni-riga" style="margin-top:26px">
@@ -683,8 +619,8 @@ const FATTO = () => `
    DISEGNO
    ============================================================ */
 const VISTE = {
-  creator: { 1: P1, 2: C2, 3: C3, 4: C4, 5: C5, 6: C6, 7: FATTO },
-  azienda: { 1: P1, 2: A2, 3: A3, 4: A4, 5: A5, 6: A6, 7: FATTO }
+  creator: { 1: P1, 2: C2, 3: C3, 4: C4, 5: C6, 6: FATTO },
+  azienda: { 1: P1, 2: A2, 3: A3, 4: A4, 5: A5, 6: FATTO }
 };
 
 function disegna() {
@@ -713,28 +649,22 @@ function invia(e) {
 
   if (S.lato === 'creator') {
     if (S.passo === 3) {
-      S.legale = { nome: v('lNome'), cognome: v('lCognome'), nascita: v('lNascita'),
-                   cf: v('lCf'), residenza: v('lRes') };
+      S.legale = { nome: v('lNome'), cognome: v('lCognome'), nascita: v('lNascita') };
       if (!S.legale.nome || !S.legale.cognome) return avviso('Servono nome e cognome reali');
       if (!S.legale.nascita) return avviso('Serve la data di nascita');
       if (!maggiorenne(S.legale.nascita)) return avviso('Devi essere maggiorenne per firmare un accordo');
-      if (!S.legale.cf) return avviso('Serve il codice fiscale per la ricevuta');
     }
     if (S.passo === 4) {
       S.pubblico = { nome: v('pNome'), maniglia: v('pManiglia'), nicchia: v('pNicchia'),
-                     bio: v('pBio'), citta: v('pCitta') };
+                     bio: v('pBio') };
       S.prezzoDa = v('pPrezzo');
       if (!S.pubblico.nome) return avviso('Serve un nome pubblico');
       if (!S.pubblico.maniglia) return avviso('Serve il tuo indirizzo pubblico');
       if (!S.categorie.length) return avviso('Scegli almeno una categoria, o non ti troverà nessuno');
     }
-    if (S.passo === 5) {
-      S.intestatario = v('bInt'); S.iban = v('bIban');
-      if (S.partitaIva === null) return avviso('Dicci se hai la partita IVA');
-    }
   } else {
     if (S.passo === 2) {
-      S.impresa = { ragione: v('iRagione'), piva: v('iPiva'), sede: v('iSede'), nome: v('iNome') };
+      S.impresa = { ragione: v('iRagione'), piva: v('iPiva'), nome: v('iNome') };
       if (!S.impresa.ragione) return avviso('Serve la ragione sociale');
       if (!S.impresa.piva) return avviso('Serve la partita IVA: è quello che ti rende verificabile');
       if (!S.impresa.nome) S.impresa.nome = S.impresa.ragione;
@@ -745,10 +675,8 @@ function invia(e) {
     }
     if (S.passo === 4) {
       S.settore = v('aSettore'); S.prodotti = v('aProdotti');
-      if (!S.settore) return avviso('Serve il settore');
-    }
-    if (S.passo === 5) {
       S.budget = v('aBudget'); S.posti = v('aPosti') || 1;
+      if (!S.settore) return avviso('Serve il settore');
       if (!S.cerca.length) return avviso('Scegli almeno un formato');
       if (!S.budget) return avviso('Serve una forbice di budget');
     }
@@ -778,7 +706,7 @@ function leggiStorico() {
 
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-scegli],[data-torna],[data-collega],[data-avanti],[data-blocca],'
-    + '[data-piva],[data-storico],[data-aggiungi],[data-togli],[data-termini],[data-finisci],'
+    + '[data-storico],[data-aggiungi],[data-togli],[data-termini],[data-finisci],'
     + '[data-cat],[data-formato],[data-verifica]');
   if (!b) return;
 
@@ -803,7 +731,6 @@ document.addEventListener('click', (e) => {
   if (b.dataset.avanti !== undefined) { S.passo++; return disegna(); }
 
   /* --- scelte a pulsante --- */
-  if (b.dataset.piva !== undefined) { S.partitaIva = b.dataset.piva === '1'; return disegna(); }
   if (b.dataset.verifica) { S.comeVerifica = b.dataset.verifica; return disegna(); }
   if (b.dataset.termini !== undefined) { S.termini = !S.termini; return disegna(); }
 
@@ -840,10 +767,9 @@ document.addEventListener('click', (e) => {
     if (!S.termini) return avviso('Devi accettare i termini per entrare');
     if (S.lato === 'creator' && S.haStorico) leggiStorico();
     if (S.lato === 'azienda') {
-      S.referente = { nome: el('rNome')?.value.trim() || '', cognome: el('rCognome')?.value.trim() || '',
-                      ruolo: el('rRuolo')?.value.trim() || '' };
+      S.referente = { nome: el('rNome')?.value.trim() || '', cognome: el('rCognome')?.value.trim() || '' };
     }
-    S.passo = 7; return disegna();
+    S.passo = 6; return disegna();
   }
 });
 

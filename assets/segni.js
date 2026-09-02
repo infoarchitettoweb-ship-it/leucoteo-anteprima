@@ -82,6 +82,7 @@ export const ICO = {
 
   /* freccia avanti */
   avanti: () => I(`<path d="M9 5l7 7-7 7"/>`),
+  giu:     () => I(`<path d="M6 9.5l6 6 6-6"/>`),
 
   /* occhio: cosa vede chi apre */
   occhio: () => I(`<path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12z"/>
